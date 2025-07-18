@@ -1,0 +1,155 @@
+body { 
+    font-family: 'Segoe UI', Tahoma, sans-serif; 
+    line-height: 1.6; 
+    color: #333; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 20px; 
+    background-color: #f5f5f5;
+}
+
+.header { 
+    background: #2c3e50; 
+    color: white; 
+    padding: 20px; 
+    border-radius: 8px; 
+    margin-bottom: 30px; 
+    text-align: center;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.summary-card { 
+    background: #ffffff; 
+    border-radius: 8px; 
+    padding: 20px; 
+    margin-bottom: 30px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.summary-stats {
+    display: flex; 
+    gap: 15px; 
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.test-section {
+    margin-bottom: 40px;
+}
+
+.table-card { 
+    border-radius: 8px; 
+    margin-bottom: 20px; 
+    overflow: hidden; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table-card.match {
+    border-left: 4px solid #28a745;
+}
+
+.table-card.error {
+    border-left: 4px solid #dc3545;
+}
+
+.table-header { 
+    padding: 12px 15px; 
+    cursor: pointer; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.table-header:hover { 
+    background-color: #e9ecef; 
+}
+
+.table-details { 
+    padding: 15px; 
+    background-color: #ffffff;
+}
+
+.schema-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin: 15px 0; 
+    font-size: 14px; 
+}
+
+.schema-table th { 
+    background: #e9ecef; 
+    padding: 12px; 
+    text-align: left; 
+    font-weight: 600;
+}
+
+.schema-table td { 
+    padding: 12px; 
+    border-bottom: 1px solid #ddd; 
+}
+
+.text-center {
+    text-align: center;
+}
+
+.match { 
+    background-color: #d4edda; 
+}
+
+.error { 
+    background-color: #f8d7da; 
+}
+
+.warning { 
+    background-color: #fff3cd; 
+}
+
+.badge { 
+    padding: 8px 12px; 
+    border-radius: 12px; 
+    font-size: 12px; 
+    font-weight: bold; 
+    display: inline-block; 
+}
+
+.badge-success { 
+    background: #28a745; 
+    color: white; 
+}
+
+.badge-danger { 
+    background: #dc3545; 
+    color: white; 
+}
+
+details[open] .toggle-icon {
+    transform: rotate(90deg);
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.issue-section {
+    margin-bottom: 20px;
+}
+
+.issue-section ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.issue-section li {
+    color: #dc3545;
+    margin-bottom: 5px;
+}
+
+.schema-section, .count-section, .duplicate-section, .null-section, .data-section {
+    margin-bottom: 20px;
+}

@@ -1,0 +1,8 @@
+{
+    "mappings": {
+        "dim_bu": {
+            "sql_table": "DimBU",
+            "primary_keys": ["id_bu"]
+        }
+    }
+}
