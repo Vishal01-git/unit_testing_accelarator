@@ -1,0 +1,5 @@
+Flask
+pandas
+pyathena
+pyodbc
+dominate

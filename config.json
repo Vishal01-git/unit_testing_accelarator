@@ -1,8 +1,24 @@
 {
     "mappings": {
-        "dim_bu": {
-            "sql_table": "DimBU",
-            "primary_keys": ["id_bu"]
+        "int_dimcustomershiptohistorical": {
+            "sql_table": "DimCustomerShipToHistorical",
+            "primary_keys": []
+        },
+        "int_dimcustomersoldtohistorical": {
+            "sql_table": "DimCustomerSoldToHistorical",
+            "primary_keys": []
+        },
+        "int_dimleddeliverypointrowproduct": {
+            "sql_table": "DimLedDeliveryPointRowProduct",
+            "primary_keys": []
+        },
+        "int_dimmaterial": {
+            "sql_table": "DimMaterial",
+            "primary_keys": []
+        },
+        "int_factrevenues": {
+            "sql_table": "FactRevenues",
+            "primary_keys": []
         }
     }
 }

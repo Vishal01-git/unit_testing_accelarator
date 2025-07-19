@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Test Validator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #367BF5;
+            --primary-hover: #2a62c4;
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --text-color: #1d2129;
+            --text-secondary: #606770;
+            --border-color: #dddfe2;
+            --input-background: #f5f6f7;
+            --console-background: #1e1e1e;
+            --console-text: #d4d4d4;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 3rem auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 500;
+            margin-bottom: .5rem;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        input[type="text"], textarea {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-background);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1em;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(54, 123, 245, 0.2);
+        }
+
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.99);
+        }
+        
+        #output-container {
+            display: none;
+        }
+
+        #output {
+            margin-top: 1.5rem;
+            background: var(--console-background);
+            color: var(--console-text);
+            padding: 1.5rem;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+            font-size: 0.9em;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        #spinner {
+            display: none;
+            margin: 20px auto;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0,0,0,0.1);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        #report-link-container {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .report-btn.view {
+            display: inline-block;
+            background-color: var(--success-color);
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 12px 24px;
+            border-radius: 6px;
+            transition: opacity 0.2s;
+        }
+
+        .report-btn.view:hover {
+            opacity: 0.9;
+        }
+
+        .report-btn.download {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            padding: 8px;
+            border-radius: 50%;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .report-btn.download:hover {
+            background-color: #e4e6eb;
+        }
+
+        .generated-path {
+            background-color: var(--input-background);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+            font-size: 0.9em;
+            word-break: break-all;
+            margin-top: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Unit Testing Validator</h1>
+            <p>A unified interface to configure and run your data validation suite.</p>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Dynamic Configuration</h2>
+            <div class="form-grid">
+                <div class="form-group"><label for="env">Environment</label><input type="text" id="env" placeholder="dev,pprd,prod" onkeyup="updatePaths()"></div>
+                <div class="form-group"><label for="initiative">Initiative ID</label><input type="text" id="initiative" placeholder="e.g 6051" onkeyup="updatePaths()"></div>
+                <div class="form-group"><label for="name">Name</label><input type="text" id="name" placeholder="e.g c2p,pgl" onkeyup="updatePaths()"></div>
+                <div class="form-group"><label for="layer">Layer</label><input type="text" id="layer" placeholder="athena layer e.g stg,int,mart" onkeyup="updatePaths()"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="section-title">Execution Parameters</h2>
+            <div class="form-grid">
+                <div class="form-group" style="grid-column: 1 / -1;"><label for="pythonPath">Path to Python in venv</label><input type="text" id="pythonPath" value="venv\Scripts\python.exe"></div>
+                <div class="form-group"><label for="aws-region">AWS Region</label><input type="text" id="aws-region" value="ap-southeast-1"></div>
+                <div class="form-group"><label for="mssql-schema">SQL Schema</label><input type="text" id="mssql-schema" placeholder="e.g stg,dmt,salesbi"></div>
+                <div class="form-group" style="grid-column: 1 / -1;"><label for="tests">Tests to Run</label><input type="text" id="tests" value="schema,count"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Table Mappings</h2>
+            <div class="form-grid">
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="athena-tables">Athena Tables (comma-separated)</label>
+                    <textarea id="athena-tables" placeholder="athena_table1, athena_table2"></textarea>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="sql-tables">SQL Server Tables (in corresponding order)</label>
+                    <textarea id="sql-tables" placeholder="sql_table1, sql_table2"></textarea>
+                </div>
+                 <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="primary-keys">Primary Keys (optional, comma-separated for tables, semicolon-separated for multiple keys)</label>
+                    <textarea id="primary-keys" placeholder="id1;id2, id3, "></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Generated Paths (Read-Only)</h2>
+            <div class="form-grid">
+                <div class="form-group"><label>S3 Staging</label><div id="s3-staging-path" class="generated-path"></div></div>
+                <div class="form-group"><label>Athena DB</label><div id="athena-db-path" class="generated-path"></div></div>
+                <div class="form-group"><label>Athena Workgroup</label><div id="athena-workgroup-path" class="generated-path"></div></div>
+                <div class="form-group"><label>SQL Server</label><div id="mssql-server-path" class="generated-path"></div></div>
+                <div class="form-group"><label>SQL DB</label><div id="mssql-db-path" class="generated-path"></div></div>
+            </div>
+        </div>
+        
+        <button id="run-btn" class="btn">Run Validation</button>
+        
+        <div id="output-container">
+             <div id="spinner"></div>
+             <div id="output"></div>
+             <div id="report-link-container"></div>
+        </div>
+    </div>
+
+    <script>
+        function updatePaths() {
+            const env = document.getElementById('env').value.toLowerCase();
+            let sqlEnv = env;
+            if (env === 'pprd') {
+                sqlEnv = 'uat';
+            }
+            const initiative = document.getElementById('initiative').value;
+            const name = document.getElementById('name').value;
+            const layer = document.getElementById('layer').value;
+            document.getElementById('s3-staging-path').textContent = `s3://al-gdo-${env}-ap-dl-${initiative}-formatted-p/`;
+            document.getElementById('athena-db-path').textContent = `${env}_bi_ap_${initiative}_${layer}_${name}`;
+            document.getElementById('athena-workgroup-path').textContent = `${initiative}-workgroup`;
+            document.getElementById('mssql-server-path').textContent = `al-sas-big-${sqlEnv}-sql-${name}-01.database.windows.net`;
+            document.getElementById('mssql-db-path').textContent = `al-sas-big-${sqlEnv}-sql-${name}-01-db-01`;
+        }
+        document.addEventListener('DOMContentLoaded', updatePaths);
+
+        document.getElementById('run-btn').addEventListener('click', async () => {
+            const outputContainer = document.getElementById('output-container');
+            const outputDiv = document.getElementById('output');
+            const spinner = document.getElementById('spinner');
+            const reportLinkContainer = document.getElementById('report-link-container');
+            
+            outputContainer.style.display = 'block';
+            outputDiv.innerHTML = '';
+            reportLinkContainer.innerHTML = '';
+            spinner.style.display = 'block';
+
+            const mappings = {};
+            const athenaTables = document.getElementById('athena-tables').value.split(',').map(t => t.trim()).filter(Boolean);
+            const sqlTables = document.getElementById('sql-tables').value.split(',').map(t => t.trim()).filter(Boolean);
+            const primaryKeysList = document.getElementById('primary-keys').value.split(',').map(k => k.trim());
+            
+            if (athenaTables.length !== sqlTables.length) {
+                outputDiv.innerHTML = `<span class="error-message">Error: The number of Athena tables must match the number of SQL Server tables.</span>`;
+                spinner.style.display = 'none';
+                return;
+            }
+
+            for (let i = 0; i < athenaTables.length; i++) {
+                const athenaTable = athenaTables[i];
+                const sqlTable = sqlTables[i];
+                const primaryKeys = (primaryKeysList[i] || '').split(';').map(k => k.trim()).filter(Boolean);
+                mappings[athenaTable] = { "sql_table": sqlTable, "primary_keys": primaryKeys };
+            }
+
+            const payload = {
+                "pythonPath": document.getElementById('pythonPath').value,
+                "aws-region": document.getElementById('aws-region').value,
+                "s3-staging": document.getElementById('s3-staging-path').textContent,
+                "athena-db": document.getElementById('athena-db-path').textContent,
+                "athena-workgroup": document.getElementById('athena-workgroup-path').textContent,
+                "mssql-server": document.getElementById('mssql-server-path').textContent,
+                "mssql-db": document.getElementById('mssql-db-path').textContent,
+                "mssql-schema": document.getElementById('mssql-schema').value,
+                "tests": document.getElementById('tests').value,
+                "mappings": mappings
+            };
+
+            if (!payload.pythonPath) {
+                outputDiv.innerHTML = `<span class="error-message">Error: Please provide the path to the Python executable in your virtual environment.</span>`;
+                spinner.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch('/run_script', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    outputDiv.innerHTML = result.output;
+                    if(result.report_url) {
+                        // Create the View and Download links
+                        const viewLink = `<a href="${result.report_url}" target="_blank" class="report-btn view">View Report</a>`;
+                        const downloadLink = `
+                            <a href="${result.report_url}" class="report-btn download" download="validation_report.html" title="Download Report">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                            </a>`;
+                        reportLinkContainer.innerHTML = viewLink + downloadLink;
+                    }
+                } else {
+                     outputDiv.innerHTML = `<span class="error-message">${result.output}</span>`;
+                }
+            } catch (error) {
+                outputDiv.innerHTML = `<span class="error-message">An unexpected error occurred: ${error}</span>`;
+            } finally {
+                spinner.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
