@@ -1,23 +1,67 @@
 {
     "mappings": {
-        "int_dimcustomershiptohistorical": {
-            "sql_table": "DimCustomerShipToHistorical",
+        "appsecurity_country": {
+            "sql_table": "APPSECURITY.COUNTRY",
             "primary_keys": []
         },
-        "int_dimcustomersoldtohistorical": {
-            "sql_table": "DimCustomerSoldToHistorical",
+        "appsecurity_country_group": {
+            "sql_table": "APPSECURITY.COUNTRY_GROUP",
             "primary_keys": []
         },
-        "int_dimleddeliverypointrowproduct": {
-            "sql_table": "DimLedDeliveryPointRowProduct",
+        "appsecurity_country_group_user": {
+            "sql_table": "APPSECURITY.COUNTRY_GROUP_USER",
             "primary_keys": []
         },
-        "int_dimmaterial": {
-            "sql_table": "DimMaterial",
+        "appsecurity_location": {
+            "sql_table": "APPSECURITY.LOCATION",
             "primary_keys": []
         },
-        "int_factrevenues": {
-            "sql_table": "FactRevenues",
+        "appsecurity_region": {
+            "sql_table": "APPSECURITY.REGION",
+            "primary_keys": []
+        },
+        "appsecurity_time_zone": {
+            "sql_table": "APPSECURITY.TIME_ZONE",
+            "primary_keys": []
+        },
+        "appsecurity_user_access_level": {
+            "sql_table": "APPSECURITY.USER_ACCESS_LEVEL",
+            "primary_keys": []
+        },
+        "appsecurity_user_authorization": {
+            "sql_table": "APPSECURITY.USER_AUTHORIZATION",
+            "primary_keys": []
+        },
+        "appsecurity_user_login": {
+            "sql_table": "APPSECURITY.USER_LOGIN",
+            "primary_keys": []
+        },
+        "appsecurity_user_logon": {
+            "sql_table": "APPSECURITY.USER_LOGON",
+            "primary_keys": []
+        },
+        "bar_company": {
+            "sql_table": "BAR.COMPANY",
+            "primary_keys": []
+        },
+        "bar_company_event": {
+            "sql_table": "BAR.COMPANY_EVENT",
+            "primary_keys": []
+        },
+        "bar_company_project_group_audit": {
+            "sql_table": "BAR.COMPANY_PROJECT_GROUP_AUDIT",
+            "primary_keys": []
+        },
+        "bar_project_audit": {
+            "sql_table": "BAR.PROJECT_AUDIT",
+            "primary_keys": []
+        },
+        "bar_project_product_audit": {
+            "sql_table": "BAR.PROJECT_PRODUCT_AUDIT",
+            "primary_keys": []
+        },
+        "bar_user_activity": {
+            "sql_table": "BAR.USER_ACTIVITY",
             "primary_keys": []
         }
     }

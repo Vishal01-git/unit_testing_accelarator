@@ -1,0 +1,3306 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Unit Testing Validation Report</title>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>body { 
+    font-family: 'Segoe UI', Tahoma, sans-serif; 
+    line-height: 1.6; 
+    color: #333; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 20px; 
+    background-color: #f5f5f5;
+}
+
+.header { 
+    background: #2c3e50; 
+    color: white; 
+    padding: 20px; 
+    border-radius: 8px; 
+    margin-bottom: 30px; 
+    text-align: center;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.summary-card { 
+    background: #ffffff; 
+    border-radius: 8px; 
+    padding: 20px; 
+    margin-bottom: 30px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.summary-stats {
+    display: flex; 
+    gap: 15px; 
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.test-section {
+    margin-bottom: 40px;
+}
+
+.table-card { 
+    border-radius: 8px; 
+    margin-bottom: 20px; 
+    overflow: hidden; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table-card.match {
+    border-left: 4px solid #28a745;
+}
+
+.table-card.error {
+    border-left: 4px solid #dc3545;
+}
+
+.table-header { 
+    padding: 12px 15px; 
+    cursor: pointer; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.table-header:hover { 
+    background-color: #e9ecef; 
+}
+
+.table-details { 
+    padding: 15px; 
+    background-color: #ffffff;
+}
+
+.schema-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin: 15px 0; 
+    font-size: 14px; 
+}
+
+.schema-table th { 
+    background: #e9ecef; 
+    padding: 12px; 
+    text-align: left; 
+    font-weight: 600;
+}
+
+.schema-table td { 
+    padding: 12px; 
+    border-bottom: 1px solid #ddd; 
+}
+
+.text-center {
+    text-align: center;
+}
+
+.match { 
+    background-color: #d4edda; 
+}
+
+.error { 
+    background-color: #f8d7da; 
+}
+
+.warning { 
+    background-color: #fff3cd; 
+}
+
+.badge { 
+    padding: 8px 12px; 
+    border-radius: 12px; 
+    font-size: 12px; 
+    font-weight: bold; 
+    display: inline-block; 
+}
+
+.badge-success { 
+    background: #28a745; 
+    color: white; 
+}
+
+.badge-danger { 
+    background: #dc3545; 
+    color: white; 
+}
+
+details[open] .toggle-icon {
+    transform: rotate(90deg);
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.issue-section {
+    margin-bottom: 20px;
+}
+
+.issue-section ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.issue-section li {
+    color: #dc3545;
+    margin-bottom: 5px;
+}
+
+.schema-section, .count-section, .duplicate-section, .null-section, .data-section {
+    margin-bottom: 20px;
+}</style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Unit Testing Validation Report</h1>
+      <p>Generated on 2025-12-12 21:17:17</p>
+    </div>
+    <div class="summary-card">
+      <h2>Validation Summary</h2>
+      <div class="summary-stats">
+        <span class="badge">Tables Tested: 16</span>
+        <span class="badge badge-success">Schema Valid: 6</span>
+        <span class="badge badge-danger">Schema Issues: 10</span>
+      </div>
+    </div>
+    <h2>Detailed Validation Results</h2>
+    <div class="test-section">
+      <h3>Schema Test Results</h3>
+      <div class="table-card match">
+        <details>
+          <summary class="table-header">
+            <strong>appsecurity_country ↔ APPSECURITY.COUNTRY</strong>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_name</td>
+                    <td>COUNTRY_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_code</td>
+                    <td>COUNTRY_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_id</td>
+                    <td>COUNTRY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>organization_unit</td>
+                    <td>ORGANIZATION_UNIT</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card match">
+        <details>
+          <summary class="table-header">
+            <strong>appsecurity_country_group ↔ APPSECURITY.COUNTRY_GROUP</strong>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_userid</td>
+                    <td>LAST_UPDATED_USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_group_name</td>
+                    <td>COUNTRY_GROUP_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>record_source</td>
+                    <td>RECORD_SOURCE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_group_id</td>
+                    <td>COUNTRY_GROUP_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_group_id_old</td>
+                    <td>COUNTRY_GROUP_ID_OLD</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_id</td>
+                    <td>COUNTRY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>application_id</td>
+                    <td>APPLICATION_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_date</td>
+                    <td>CREATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_userid</td>
+                    <td>CREATED_USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_date</td>
+                    <td>LAST_UPDATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card match">
+        <details>
+          <summary class="table-header">
+            <strong>appsecurity_country_group_user ↔ APPSECURITY.COUNTRY_GROUP_USER</strong>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_userid</td>
+                    <td>LAST_UPDATED_USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_group_id</td>
+                    <td>COUNTRY_GROUP_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_group_user_id</td>
+                    <td>COUNTRY_GROUP_USER_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>login_id</td>
+                    <td>LOGIN_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_date</td>
+                    <td>LAST_UPDATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card error">
+        <details>
+          <summary class="table-header">
+            <strong>appsecurity_location ↔ APPSECURITY.LOCATION</strong>
+            <span class="badge badge-danger">1 issues</span>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="issue-section">
+              <h4>Validation Issues</h4>
+              <ul>
+                <li>Data type mismatch: appsecurity_location.service_fee (Athena: decimal(19,4)) vs APPSECURITY.LOCATION.SERVICE_FEE (SQL Server: money)</li>
+              </ul>
+            </div>
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>agency_coord</td>
+                    <td>AGENCY_COORD</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>region_id</td>
+                    <td>REGION_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>loc_server_name</td>
+                    <td>LOC_SERVER_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>loc_comments</td>
+                    <td>LOC_COMMENTS</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>fax</td>
+                    <td>FAX</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>zip</td>
+                    <td>ZIP</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country</td>
+                    <td>COUNTRY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>state_id</td>
+                    <td>STATE_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>suburb</td>
+                    <td>SUBURB</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>address_line_3</td>
+                    <td>ADDRESS_LINE_3</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>debt_collector_dtl1</td>
+                    <td>DEBT_COLLECTOR_DTL1</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_date</td>
+                    <td>CREATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_date</td>
+                    <td>LAST_UPDATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>address_line_2</td>
+                    <td>ADDRESS_LINE_2</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>service_fee</td>
+                    <td>SERVICE_FEE</td>
+                    <td>decimal(19,4)</td>
+                    <td>money</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>barcode_no</td>
+                    <td>BARCODE_NO</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>city</td>
+                    <td>CITY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>debt_collector_dtl2</td>
+                    <td>DEBT_COLLECTOR_DTL2</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>contact</td>
+                    <td>CONTACT</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>address_line_1</td>
+                    <td>ADDRESS_LINE_1</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>location_name</td>
+                    <td>LOCATION_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>location_pid</td>
+                    <td>LOCATION_PID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_userid</td>
+                    <td>CREATED_USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>phone</td>
+                    <td>PHONE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>location_uid</td>
+                    <td>LOCATION_UID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>location_id</td>
+                    <td>LOCATION_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_userid</td>
+                    <td>LAST_UPDATED_USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>loc_database_name</td>
+                    <td>LOC_DATABASE_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>location_type</td>
+                    <td>LOCATION_TYPE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>loc_bank</td>
+                    <td>LOC_BANK</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>loc_bank_bsb_no</td>
+                    <td>LOC_BANK_BSB_NO</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card match">
+        <details>
+          <summary class="table-header">
+            <strong>appsecurity_region ↔ APPSECURITY.REGION</strong>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>region_id</td>
+                    <td>REGION_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>region_code</td>
+                    <td>REGION_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>pdf_email_address</td>
+                    <td>PDF_EMAIL_ADDRESS</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>from_val</td>
+                    <td>FROM_VAL</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>time_zone_id</td>
+                    <td>TIME_ZONE_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>region_prefix</td>
+                    <td>REGION_PREFIX</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>biller_code</td>
+                    <td>BILLER_CODE</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>next_ref_no</td>
+                    <td>NEXT_REF_NO</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>region_id_old</td>
+                    <td>REGION_ID_OLD</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>record_source</td>
+                    <td>RECORD_SOURCE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>old_region_id</td>
+                    <td>OLD_REGION_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>descr</td>
+                    <td>DESCR</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_date</td>
+                    <td>CREATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_date</td>
+                    <td>LAST_UPDATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>barcode_no</td>
+                    <td>BARCODE_NO</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>gl_globalaccount_no</td>
+                    <td>GL_GLOBALACCOUNT_NO</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_userid</td>
+                    <td>CREATED_USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_userid</td>
+                    <td>LAST_UPDATED_USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>gl_account_no</td>
+                    <td>GL_ACCOUNT_NO</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_id</td>
+                    <td>COUNTRY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card error">
+        <details>
+          <summary class="table-header">
+            <strong>appsecurity_time_zone ↔ APPSECURITY.TIME_ZONE</strong>
+            <span class="badge badge-danger">1 issues</span>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="issue-section">
+              <h4>Validation Issues</h4>
+              <ul>
+                <li>Data type mismatch: appsecurity_time_zone.time_gmt_offset (Athena: decimal(11,1)) vs APPSECURITY.TIME_ZONE.TIME_GMT_OFFSET (SQL Server: decimal(5,1))</li>
+              </ul>
+            </div>
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>tz_standard_name</td>
+                    <td>TZ_STANDARD_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>time_zone_code</td>
+                    <td>TIME_ZONE_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>time_gmt_offset</td>
+                    <td>TIME_GMT_OFFSET</td>
+                    <td>decimal(11,1)</td>
+                    <td>decimal(5,1)</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>time_zone_id_old</td>
+                    <td>TIME_ZONE_ID_OLD</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>record_source</td>
+                    <td>RECORD_SOURCE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>time_zone_id</td>
+                    <td>TIME_ZONE_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>time_zone_name</td>
+                    <td>TIME_ZONE_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card match">
+        <details>
+          <summary class="table-header">
+            <strong>appsecurity_user_access_level ↔ APPSECURITY.USER_ACCESS_LEVEL</strong>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>description</td>
+                    <td>DESCRIPTION</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>access_level</td>
+                    <td>ACCESS_LEVEL</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>seq_no</td>
+                    <td>SEQ_NO</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card error">
+        <details>
+          <summary class="table-header">
+            <strong>appsecurity_user_authorization ↔ APPSECURITY.USER_AUTHORIZATION</strong>
+            <span class="badge badge-danger">1 issues</span>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="issue-section">
+              <h4>Validation Issues</h4>
+              <ul>
+                <li>Data type mismatch: appsecurity_user_authorization.authorization_limit (Athena: decimal(19,4)) vs APPSECURITY.USER_AUTHORIZATION.AUTHORIZATION_LIMIT (SQL Server: money)</li>
+              </ul>
+            </div>
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>last_inserted_dt_time</td>
+                    <td>LAST_INSERTED_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_userid</td>
+                    <td>LAST_UPDATED_USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>authorization_limit</td>
+                    <td>AUTHORIZATION_LIMIT</td>
+                    <td>decimal(19,4)</td>
+                    <td>money</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>userid</td>
+                    <td>USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>currency_code</td>
+                    <td>CURRENCY_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>uid</td>
+                    <td>UID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>active_status</td>
+                    <td>ACTIVE_STATUS</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_date</td>
+                    <td>CREATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>login_id</td>
+                    <td>LOGIN_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_date</td>
+                    <td>LAST_UPDATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_load_dt_time</td>
+                    <td>LAST_LOAD_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card error">
+        <details>
+          <summary class="table-header">
+            <strong>appsecurity_user_login ↔ APPSECURITY.USER_LOGIN</strong>
+            <span class="badge badge-danger">5 issues</span>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="issue-section">
+              <h4>Validation Issues</h4>
+              <ul>
+                <li>Data type mismatch: appsecurity_user_login.authorization_limit (Athena: decimal(19,4)) vs APPSECURITY.USER_LOGIN.AUTHORIZATION_LIMIT (SQL Server: money)</li>
+                <li>Data type mismatch: appsecurity_user_login.pwd_expiry_date (Athena: timestamp) vs APPSECURITY.USER_LOGIN.PWD_EXPIRY_DATE (SQL Server: smalldatetime)</li>
+                <li>Data type mismatch: appsecurity_user_login.created_date (Athena: timestamp) vs APPSECURITY.USER_LOGIN.CREATED_DATE (SQL Server: smalldatetime)</li>
+                <li>Data type mismatch: appsecurity_user_login.pwd (Athena: varchar) vs APPSECURITY.USER_LOGIN.PWD (SQL Server: binary)</li>
+                <li>Data type mismatch: appsecurity_user_login.expiry_date (Athena: timestamp) vs APPSECURITY.USER_LOGIN.EXPIRY_DATE (SQL Server: smalldatetime)</li>
+              </ul>
+            </div>
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>user_initials</td>
+                    <td>USER_INITIALS</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>authorization_limit</td>
+                    <td>AUTHORIZATION_LIMIT</td>
+                    <td>decimal(19,4)</td>
+                    <td>money</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>login_id_old</td>
+                    <td>LOGIN_ID_OLD</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>display_price</td>
+                    <td>DISPLAY_PRICE</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>rep_id</td>
+                    <td>REP_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>record_source</td>
+                    <td>RECORD_SOURCE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>email_address</td>
+                    <td>EMAIL_ADDRESS</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>pwd_expiry_date</td>
+                    <td>PWD_EXPIRY_DATE</td>
+                    <td>timestamp</td>
+                    <td>smalldatetime</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>default_region_id</td>
+                    <td>DEFAULT_REGION_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>default_country_id</td>
+                    <td>DEFAULT_COUNTRY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>default_culture_id</td>
+                    <td>DEFAULT_CULTURE_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>active_status</td>
+                    <td>ACTIVE_STATUS</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>created_date</td>
+                    <td>CREATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>smalldatetime</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>login_id</td>
+                    <td>LOGIN_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_date</td>
+                    <td>LAST_UPDATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>employee_no</td>
+                    <td>EMPLOYEE_NO</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>pwd</td>
+                    <td>PWD</td>
+                    <td>varchar</td>
+                    <td>binary</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>login_time</td>
+                    <td>LOGIN_TIME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>logout_time</td>
+                    <td>LOGOUT_TIME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>default_location_id</td>
+                    <td>DEFAULT_LOCATION_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>user_domain</td>
+                    <td>USER_DOMAIN</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>userid</td>
+                    <td>USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>expiry_date</td>
+                    <td>EXPIRY_DATE</td>
+                    <td>timestamp</td>
+                    <td>smalldatetime</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_userid</td>
+                    <td>CREATED_USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>workstation</td>
+                    <td>WORKSTATION</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_updated_userid</td>
+                    <td>LAST_UPDATED_USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>user_name</td>
+                    <td>USER_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>access_level</td>
+                    <td>ACCESS_LEVEL</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card match">
+        <details>
+          <summary class="table-header">
+            <strong>appsecurity_user_logon ↔ APPSECURITY.USER_LOGON</strong>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>workstation</td>
+                    <td>WORKSTATION</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>login_time</td>
+                    <td>LOGIN_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>userid</td>
+                    <td>USERID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>message</td>
+                    <td>MESSAGE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>version</td>
+                    <td>VERSION</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_id</td>
+                    <td>COUNTRY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>application_id</td>
+                    <td>APPLICATION_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>id</td>
+                    <td>ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>application_module_descr</td>
+                    <td>APPLICATION_MODULE_DESCR</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card error">
+        <details>
+          <summary class="table-header">
+            <strong>bar_company ↔ BAR.COMPANY</strong>
+            <span class="badge badge-danger">4 issues</span>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="issue-section">
+              <h4>Validation Issues</h4>
+              <ul>
+                <li>Data type mismatch: bar_company.row_version (Athena: integer) vs BAR.COMPANY.ROW_VERSION (SQL Server: binary)</li>
+                <li>Data type mismatch: bar_company.latitude (Athena: decimal(16,6)) vs BAR.COMPANY.LATITUDE (SQL Server: decimal(11,6))</li>
+                <li>Data type mismatch: bar_company.longitude (Athena: decimal(16,6)) vs BAR.COMPANY.LONGITUDE (SQL Server: decimal(11,6))</li>
+                <li>Column missing in SQL Server: bar_company.country_code (Type: varchar)</li>
+              </ul>
+            </div>
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>address_2</td>
+                    <td>ADDRESS_2</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>region_id</td>
+                    <td>REGION_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>website</td>
+                    <td>WEBSITE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>gdn_company_id</td>
+                    <td>GDN_COMPANY_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>parent_customer_id</td>
+                    <td>PARENT_CUSTOMER_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>address_1</td>
+                    <td>ADDRESS_1</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>company_pid</td>
+                    <td>COMPANY_PID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>row_version</td>
+                    <td>ROW_VERSION</td>
+                    <td>integer</td>
+                    <td>binary</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>al_account_no</td>
+                    <td>AL_ACCOUNT_NO</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>profile</td>
+                    <td>PROFILE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>region_pid</td>
+                    <td>REGION_PID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>nationality_code</td>
+                    <td>NATIONALITY_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>updated_by</td>
+                    <td>UPDATED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>lob</td>
+                    <td>LOB</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_by</td>
+                    <td>CREATED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>sales_rep_pid</td>
+                    <td>SALES_REP_PID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>active_status</td>
+                    <td>ACTIVE_STATUS</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_date</td>
+                    <td>CREATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>branch_id</td>
+                    <td>BRANCH_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>owner</td>
+                    <td>OWNER</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>city</td>
+                    <td>CITY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>market_domain</td>
+                    <td>MARKET_DOMAIN</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>company_name</td>
+                    <td>COMPANY_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>gl_global_account</td>
+                    <td>GL_GLOBAL_ACCOUNT</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>native_name</td>
+                    <td>NATIVE_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>al_industry_sector_id_6</td>
+                    <td>AL_INDUSTRY_SECTOR_ID_6</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>updated_date</td>
+                    <td>UPDATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>sales_center_id</td>
+                    <td>SALES_CENTER_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>postal_code</td>
+                    <td>POSTAL_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>latitude</td>
+                    <td>LATITUDE</td>
+                    <td>decimal(16,6)</td>
+                    <td>decimal(11,6)</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>cust_no</td>
+                    <td>CUST_NO</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>product_description</td>
+                    <td>PRODUCT_DESCRIPTION</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_id</td>
+                    <td>COUNTRY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>address_3</td>
+                    <td>ADDRESS_3</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>company_id</td>
+                    <td>COMPANY_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>longitude</td>
+                    <td>LONGITUDE</td>
+                    <td>decimal(16,6)</td>
+                    <td>decimal(11,6)</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>region_branch_id</td>
+                    <td>REGION_BRANCH_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>al_indust_id</td>
+                    <td>AL_INDUST_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="warning">
+                    <td>country_code</td>
+                    <td>—</td>
+                    <td>varchar</td>
+                    <td>—</td>
+                    <td>Missing in SQL Server</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card error">
+        <details>
+          <summary class="table-header">
+            <strong>bar_company_event ↔ BAR.COMPANY_EVENT</strong>
+            <span class="badge badge-danger">4 issues</span>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="issue-section">
+              <h4>Validation Issues</h4>
+              <ul>
+                <li>Data type mismatch: bar_company_event.row_version (Athena: integer) vs BAR.COMPANY_EVENT.ROW_VERSION (SQL Server: binary)</li>
+                <li>Data type mismatch: bar_company_event.start_time (Athena: varchar) vs BAR.COMPANY_EVENT.START_TIME (SQL Server: time)</li>
+                <li>Data type mismatch: bar_company_event.end_time (Athena: varchar) vs BAR.COMPANY_EVENT.END_TIME (SQL Server: time)</li>
+                <li>Column missing in SQL Server: bar_company_event.country_code (Type: varchar)</li>
+              </ul>
+            </div>
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>outcome</td>
+                    <td>OUTCOME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>google_event_id</td>
+                    <td>GOOGLE_EVENT_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>feedback_issue_id</td>
+                    <td>FEEDBACK_ISSUE_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>parent_event_id</td>
+                    <td>PARENT_EVENT_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>row_version</td>
+                    <td>ROW_VERSION</td>
+                    <td>integer</td>
+                    <td>binary</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>subject</td>
+                    <td>SUBJECT</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>start_time</td>
+                    <td>START_TIME</td>
+                    <td>varchar</td>
+                    <td>time</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>updated_by</td>
+                    <td>UPDATED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>event_date</td>
+                    <td>EVENT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_by</td>
+                    <td>CREATED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>uid</td>
+                    <td>UID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>event_id</td>
+                    <td>EVENT_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_date</td>
+                    <td>CREATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>event_type_id</td>
+                    <td>EVENT_TYPE_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>repeat_on</td>
+                    <td>REPEAT_ON</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>repeat_end_date</td>
+                    <td>REPEAT_END_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>feedback_type_id</td>
+                    <td>FEEDBACK_TYPE_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>sync_date</td>
+                    <td>SYNC_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>followup_event_id</td>
+                    <td>FOLLOWUP_EVENT_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>repeat_count</td>
+                    <td>REPEAT_COUNT</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>end_time</td>
+                    <td>END_TIME</td>
+                    <td>varchar</td>
+                    <td>time</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>event_created_flag</td>
+                    <td>EVENT_CREATED_FLAG</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>repeat_every</td>
+                    <td>REPEAT_EVERY</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>sync</td>
+                    <td>SYNC</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>details</td>
+                    <td>DETAILS</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>copy_to</td>
+                    <td>COPY_TO</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>nature</td>
+                    <td>NATURE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>repeat_type</td>
+                    <td>REPEAT_TYPE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>updated_date</td>
+                    <td>UPDATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>purpose</td>
+                    <td>PURPOSE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>company_event_pid</td>
+                    <td>COMPANY_EVENT_PID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_id</td>
+                    <td>COUNTRY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>company_id</td>
+                    <td>COMPANY_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="warning">
+                    <td>country_code</td>
+                    <td>—</td>
+                    <td>varchar</td>
+                    <td>—</td>
+                    <td>Missing in SQL Server</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card error">
+        <details>
+          <summary class="table-header">
+            <strong>bar_company_project_group_audit ↔ BAR.COMPANY_PROJECT_GROUP_AUDIT</strong>
+            <span class="badge badge-danger">1 issues</span>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="issue-section">
+              <h4>Validation Issues</h4>
+              <ul>
+                <li>Column missing in SQL Server: bar_company_project_group_audit.country_code (Type: varchar)</li>
+              </ul>
+            </div>
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>project_group_name</td>
+                    <td>PROJECT_GROUP_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>business_supporter_id</td>
+                    <td>BUSINESS_SUPPORTER_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>updated_by</td>
+                    <td>UPDATED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_by</td>
+                    <td>CREATED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>deleted_by</td>
+                    <td>DELETED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_date</td>
+                    <td>CREATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>project_group_id</td>
+                    <td>PROJECT_GROUP_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>action</td>
+                    <td>ACTION</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>project_group_deleted_id</td>
+                    <td>PROJECT_GROUP_DELETED_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>al_tech_involved</td>
+                    <td>AL_TECH_INVOLVED</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>deleted_date</td>
+                    <td>DELETED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>updated_date</td>
+                    <td>UPDATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>company_project_group_audit_pid</td>
+                    <td>COMPANY_PROJECT_GROUP_AUDIT_PID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_id</td>
+                    <td>COUNTRY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>company_id</td>
+                    <td>COMPANY_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="warning">
+                    <td>country_code</td>
+                    <td>—</td>
+                    <td>varchar</td>
+                    <td>—</td>
+                    <td>Missing in SQL Server</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card error">
+        <details>
+          <summary class="table-header">
+            <strong>bar_project_audit ↔ BAR.PROJECT_AUDIT</strong>
+            <span class="badge badge-danger">3 issues</span>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="issue-section">
+              <h4>Validation Issues</h4>
+              <ul>
+                <li>Data type mismatch: bar_project_audit.row_version (Athena: integer) vs BAR.PROJECT_AUDIT.ROW_VERSION (SQL Server: binary)</li>
+                <li>Data type mismatch: bar_project_audit.prod_no (Athena: varchar) vs BAR.PROJECT_AUDIT.PROD_NO (SQL Server: nchar)</li>
+                <li>Column missing in SQL Server: bar_project_audit.country_code (Type: varchar)</li>
+              </ul>
+            </div>
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>one_time_sale</td>
+                    <td>ONE_TIME_SALE</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>region_id</td>
+                    <td>REGION_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>notification_by</td>
+                    <td>NOTIFICATION_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>local_program_code</td>
+                    <td>LOCAL_PROGRAM_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>reason_of_disapproval</td>
+                    <td>REASON_OF_DISAPPROVAL</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>by_dealer</td>
+                    <td>BY_DEALER</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>project_type_code</td>
+                    <td>PROJECT_TYPE_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>business_supporter_id</td>
+                    <td>BUSINESS_SUPPORTER_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>winning_price</td>
+                    <td>WINNING_PRICE</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>probability_code</td>
+                    <td>PROBABILITY_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>grant_to</td>
+                    <td>GRANT_TO</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>final_supplier_code</td>
+                    <td>FINAL_SUPPLIER_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>supply_method</td>
+                    <td>SUPPLY_METHOD</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>equipment_investment</td>
+                    <td>EQUIPMENT_INVESTMENT</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>status_date</td>
+                    <td>STATUS_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>row_version</td>
+                    <td>ROW_VERSION</td>
+                    <td>integer</td>
+                    <td>binary</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>al_account_no</td>
+                    <td>AL_ACCOUNT_NO</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>notification_date</td>
+                    <td>NOTIFICATION_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>project_audit_pid</td>
+                    <td>PROJECT_AUDIT_PID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>total_impact_value</td>
+                    <td>TOTAL_IMPACT_VALUE</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>expected_sign_date</td>
+                    <td>EXPECTED_SIGN_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>given_price</td>
+                    <td>GIVEN_PRICE</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>updated_by</td>
+                    <td>UPDATED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>installation_completed</td>
+                    <td>INSTALLATION_COMPLETED</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>last_event_date</td>
+                    <td>LAST_EVENT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_by</td>
+                    <td>CREATED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>comments</td>
+                    <td>COMMENTS</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>deleted_by</td>
+                    <td>DELETED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>company_id</td>
+                    <td>COMPANY_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>project_id</td>
+                    <td>PROJECT_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_date</td>
+                    <td>CREATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>conclusion</td>
+                    <td>CONCLUSION</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>bill_to_dealer</td>
+                    <td>BILL_TO_DEALER</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>capex_value</td>
+                    <td>CAPEX_VALUE</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>notify_approver</td>
+                    <td>NOTIFY_APPROVER</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>approval_date</td>
+                    <td>APPROVAL_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>equipment_type</td>
+                    <td>EQUIPMENT_TYPE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>reason_of_lost_details</td>
+                    <td>REASON_OF_LOST_DETAILS</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>attackedby_supplier_code</td>
+                    <td>ATTACKEDBY_SUPPLIER_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>current_supplier_code</td>
+                    <td>CURRENT_SUPPLIER_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>al_tech_involved</td>
+                    <td>AL_TECH_INVOLVED</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>deleted_date</td>
+                    <td>DELETED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>approval_status_code</td>
+                    <td>APPROVAL_STATUS_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>conversion</td>
+                    <td>CONVERSION</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>impact_date</td>
+                    <td>IMPACT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>contract_sign_date</td>
+                    <td>CONTRACT_SIGN_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>reason_of_lost</td>
+                    <td>REASON_OF_LOST</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>equipment_investment_detail</td>
+                    <td>EQUIPMENT_INVESTMENT_DETAIL</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>total_average_price</td>
+                    <td>TOTAL_AVERAGE_PRICE</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>updated_date</td>
+                    <td>UPDATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>total_gross_margin</td>
+                    <td>TOTAL_GROSS_MARGIN</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_id</td>
+                    <td>COUNTRY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>bulk_offer_type</td>
+                    <td>BULK_OFFER_TYPE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>project_name</td>
+                    <td>PROJECT_NAME</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>project_status_code</td>
+                    <td>PROJECT_STATUS_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>project_owner</td>
+                    <td>PROJECT_OWNER</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>equipment_investment_detail_other</td>
+                    <td>EQUIPMENT_INVESTMENT_DETAIL_OTHER</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>prod_no</td>
+                    <td>PROD_NO</td>
+                    <td>varchar</td>
+                    <td>nchar</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="warning">
+                    <td>country_code</td>
+                    <td>—</td>
+                    <td>varchar</td>
+                    <td>—</td>
+                    <td>Missing in SQL Server</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card error">
+        <details>
+          <summary class="table-header">
+            <strong>bar_project_product_audit ↔ BAR.PROJECT_PRODUCT_AUDIT</strong>
+            <span class="badge badge-danger">3 issues</span>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="issue-section">
+              <h4>Validation Issues</h4>
+              <ul>
+                <li>Data type mismatch: bar_project_product_audit.row_version (Athena: integer) vs BAR.PROJECT_PRODUCT_AUDIT.ROW_VERSION (SQL Server: binary)</li>
+                <li>Data type mismatch: bar_project_product_audit.bulk_offer_type (Athena: varchar) vs BAR.PROJECT_PRODUCT_AUDIT.BULK_OFFER_TYPE (SQL Server: nchar)</li>
+                <li>Column missing in SQL Server: bar_project_product_audit.country_code (Type: varchar)</li>
+              </ul>
+            </div>
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>volume_uom</td>
+                    <td>VOLUME_UOM</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>application_code</td>
+                    <td>APPLICATION_CODE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>average_price</td>
+                    <td>AVERAGE_PRICE</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>impact_value</td>
+                    <td>IMPACT_VALUE</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>application_code2</td>
+                    <td>APPLICATION_CODE2</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>row_version</td>
+                    <td>ROW_VERSION</td>
+                    <td>integer</td>
+                    <td>binary</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>gross_margin</td>
+                    <td>GROSS_MARGIN</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>product_item_id</td>
+                    <td>PRODUCT_ITEM_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>updated_by</td>
+                    <td>UPDATED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>annual_volume</td>
+                    <td>ANNUAL_VOLUME</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_by</td>
+                    <td>CREATED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>deleted_by</td>
+                    <td>DELETED_BY</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>project_id</td>
+                    <td>PROJECT_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>created_date</td>
+                    <td>CREATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>change_in_annual_value_uom</td>
+                    <td>CHANGE_IN_ANNUAL_VALUE_UOM</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>project_product_id</td>
+                    <td>PROJECT_PRODUCT_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>change_in_annual_value</td>
+                    <td>CHANGE_IN_ANNUAL_VALUE</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>deleted_date</td>
+                    <td>DELETED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>conversion</td>
+                    <td>CONVERSION</td>
+                    <td>boolean</td>
+                    <td>boolean</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>impact_value_of_year</td>
+                    <td>IMPACT_VALUE_OF_YEAR</td>
+                    <td>decimal(24,2)</td>
+                    <td>decimal(24,2)</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>updated_date</td>
+                    <td>UPDATED_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>project_product_audit_pid</td>
+                    <td>PROJECT_PRODUCT_AUDIT_PID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>product_id</td>
+                    <td>PRODUCT_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_id</td>
+                    <td>COUNTRY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>bulk_offer_type</td>
+                    <td>BULK_OFFER_TYPE</td>
+                    <td>varchar</td>
+                    <td>nchar</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="warning">
+                    <td>country_code</td>
+                    <td>—</td>
+                    <td>varchar</td>
+                    <td>—</td>
+                    <td>Missing in SQL Server</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+      <div class="table-card error">
+        <details>
+          <summary class="table-header">
+            <strong>bar_user_activity ↔ BAR.USER_ACTIVITY</strong>
+            <span class="badge badge-danger">2 issues</span>
+            <span class="toggle-icon">▶</span>
+          </summary>
+          <div class="table-details">
+            <div class="issue-section">
+              <h4>Validation Issues</h4>
+              <ul>
+                <li>Data type mismatch: bar_user_activity.row_version (Athena: integer) vs BAR.USER_ACTIVITY.ROW_VERSION (SQL Server: binary)</li>
+                <li>Column missing in SQL Server: bar_user_activity.country_code (Type: varchar)</li>
+              </ul>
+            </div>
+            <div class="schema-section">
+              <h4>Column Comparison</h4>
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column (Athena)</th>
+                    <th>Column (SQL Server)</th>
+                    <th>Athena Type</th>
+                    <th>SQL Server Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="match">
+                    <td>dwh_load_date</td>
+                    <td>DWH_LOAD_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>activity_module</td>
+                    <td>ACTIVITY_MODULE</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>user_id</td>
+                    <td>USER_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>activity_time</td>
+                    <td>ACTIVITY_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>activity_link</td>
+                    <td>ACTIVITY_LINK</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>session_id</td>
+                    <td>SESSION_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>insert_dt_time</td>
+                    <td>INSERT_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>update_dt_time</td>
+                    <td>UPDATE_DT_TIME</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>user_activity_id</td>
+                    <td>USER_ACTIVITY_ID</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>activity_desc</td>
+                    <td>ACTIVITY_DESC</td>
+                    <td>varchar</td>
+                    <td>varchar</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>country_id</td>
+                    <td>COUNTRY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="error">
+                    <td>row_version</td>
+                    <td>ROW_VERSION</td>
+                    <td>integer</td>
+                    <td>binary</td>
+                    <td>Type Mismatch</td>
+                  </tr>
+                  <tr class="match">
+                    <td>dwh_insert_date</td>
+                    <td>DWH_INSERT_DATE</td>
+                    <td>timestamp</td>
+                    <td>timestamp</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="match">
+                    <td>activity_id</td>
+                    <td>ACTIVITY_ID</td>
+                    <td>integer</td>
+                    <td>integer</td>
+                    <td>Match</td>
+                  </tr>
+                  <tr class="warning">
+                    <td>country_code</td>
+                    <td>—</td>
+                    <td>varchar</td>
+                    <td>—</td>
+                    <td>Missing in SQL Server</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+    <script>document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.table-card.error details').forEach(details =&gt; {
+        details.setAttribute('open', '');
+    });
+});</script>
+  </body>
+</html>

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duplicate Check Module for Unit Testing Validator
+Duplicate Check Module V2.0
 """
 
 import pandas as pd
@@ -24,43 +24,53 @@ class DuplicateChecker:
                 cursor_class=PandasCursor
             )
             key_list = ', '.join(primary_keys)
+            # Limit to 100 to avoid memory overflow in UI
             query = f"""
                 SELECT {key_list}, COUNT(*) as cnt
                 FROM {self.args.athena_db}.{table}
                 GROUP BY {key_list}
                 HAVING COUNT(*) > 1
+                LIMIT 100
             """
             df = conn.cursor().execute(query).as_pandas()
-            duplicates = df.to_dict('records')
-            return duplicates
+            return df.to_dict('records')
         except Exception as e:
             logging.error(f"Failed to check Athena duplicates for {table}: {str(e)}")
             raise
 
-    def get_sqlserver_duplicates(self, table: str, primary_keys: list) -> list:
+    def get_sqlserver_duplicates(self, table_str: str, primary_keys: list) -> list:
         """Check for duplicates in SQL Server table"""
         try:
+            mssql_username = "admin-airliquide-sas-big-prod-sql-apac-001"
+            mssql_password = "QAXwmFTaa35S94Y9"
             conn_str = (
                 "Driver={ODBC Driver 17 for SQL Server};"
                 f"Server={self.args.mssql_server};"
                 f"Database={self.args.mssql_db};"
-                "UID=;PWD=;"
-                "Authentication=ActiveDirectoryInteractive;"
+                f"UID={mssql_username};"
+                f"PWD={mssql_password};"
                 "Encrypt=yes;"
             )
+            
+            # V2.0: Parse schema.table
+            if '.' in table_str:
+                schema, table = table_str.split('.', 1)
+            else:
+                schema = 'dbo'
+                table = table_str
+
             with pyodbc.connect(conn_str, timeout=30) as conn:
-                key_list = ', '.join(primary_keys)
+                key_list = ', '.join([f"[{k}]" for k in primary_keys])
                 query = f"""
-                    SELECT {key_list}, COUNT(*) as cnt
-                    FROM {self.args.mssql_schema}.{table}
+                    SELECT TOP 100 {key_list}, COUNT(*) as cnt
+                    FROM [{schema}].[{table}]
                     GROUP BY {key_list}
                     HAVING COUNT(*) > 1
                 """
                 df = pd.read_sql(query, conn)
-                duplicates = df.to_dict('records')
-                return duplicates
+                return df.to_dict('records')
         except Exception as e:
-            logging.error(f"Failed to check SQL Server duplicates for {table}: {str(e)}")
+            logging.error(f"Failed to check SQL Server duplicates for {table_str}: {str(e)}")
             raise
 
     def check_duplicates(self, mappings: dict) -> dict:
@@ -85,28 +95,30 @@ class DuplicateChecker:
             }
             
             if not primary_keys:
-                table_result['issues'].append("No primary keys specified for duplicate check")
-                table_result['has_issues'] = True
+                table_result['issues'].append("Skipped: No primary keys specified")
+                table_result['has_issues'] = True # Mark as issue so user notices
                 results['tables'].append(table_result)
                 results['error_tables'] += 1
                 continue
             
             try:
-                athena_duplicates = self.get_athena_duplicates(athena_table, primary_keys)
-                sql_duplicates = self.get_sqlserver_duplicates(sql_table, primary_keys)
+                athena_dupes = self.get_athena_duplicates(athena_table, primary_keys)
+                sql_dupes = self.get_sqlserver_duplicates(sql_table, primary_keys)
+                
+                has_dupes = bool(athena_dupes or sql_dupes)
                 
                 table_result['duplicates'] = {
-                    'athena_duplicates': athena_duplicates,
-                    'sql_duplicates': sql_duplicates,
-                    'status': 'No Duplicates' if not (athena_duplicates or sql_duplicates) else 'Duplicates Found',
-                    'status_class': 'match' if not (athena_duplicates or sql_duplicates) else 'error'
+                    'athena_duplicates': athena_dupes,
+                    'sql_duplicates': sql_dupes,
+                    'status': 'Duplicate Found' if has_dupes else 'No Duplicates',
+                    'status_class': 'error' if has_dupes else 'match'
                 }
                 
-                if athena_duplicates:
-                    table_result['issues'].append(f"Found {len(athena_duplicates)} duplicate rows in Athena")
+                if athena_dupes:
+                    table_result['issues'].append(f"Found {len(athena_dupes)} duplicate sets in Athena (showing top 100)")
                     table_result['has_issues'] = True
-                if sql_duplicates:
-                    table_result['issues'].append(f"Found {len(sql_duplicates)} duplicate rows in SQL Server")
+                if sql_dupes:
+                    table_result['issues'].append(f"Found {len(sql_dupes)} duplicate sets in SQL Server (showing top 100)")
                     table_result['has_issues'] = True
                 
                 if table_result['has_issues']:

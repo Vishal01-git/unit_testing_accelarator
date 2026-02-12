@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 """
-Unit Testing Validator for Athena and SQL Server
+Unit Testing Validator V2.0 - Core Orchestrator
 """
 
-import argparse
-import json
 import logging
 import sys
-from pathlib import Path
+import os
 from schema_compare import SchemaComparator
 from count_check import CountChecker
 from duplicate_check import DuplicateChecker
@@ -15,115 +13,95 @@ from null_check import NullChecker
 from data_compare import DataComparator
 from report_generator import ReportGenerator
 
-# Set up logging
+# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def load_config(config_file: str) -> dict:
-    """Load and validate configuration"""
-    try:
-        with open(config_file) as f:
-            config = json.load(f)
-        if not isinstance(config, dict) or 'mappings' not in config:
-            raise ValueError("Config file must be a dictionary with a 'mappings' key")
-        logging.info(f"Loaded {len(config['mappings'])} table mappings")
-        return config
-    except Exception as e:
-        logging.error(f"Error loading config: {str(e)}")
-        raise
-
-def main():
-    parser = argparse.ArgumentParser(
-        description='Unit testing validator for Athena and SQL Server',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-    
-    # Athena parameters
-    parser.add_argument('--aws-region', required=True, help='AWS region name')
-    parser.add_argument('--s3-staging', required=True, help='S3 staging directory')
-    parser.add_argument('--athena-db', required=True, help='Athena database name')
-    parser.add_argument('--athena-workgroup', default='primary', help='Athena workgroup name')
-    
-    # SQL Server parameters
-    parser.add_argument('--mssql-server', required=True, help='SQL Server hostname')
-    parser.add_argument('--mssql-db', required=True, help='SQL Server database name')
-    parser.add_argument('--mssql-schema', default='dbo', help='SQL Server schema name')
-    
-    # Configuration
-    parser.add_argument('--config-file', required=True, help='JSON config file with table mappings and primary keys')
-    parser.add_argument('--output', required=True, help='Output HTML file path')
-    parser.add_argument('--tests', default='all', help='Comma-separated tests to run: schema,count,duplicates,nulls,data')
-    parser.add_argument('--sample-size', type=int, default=100, help='Number of rows for data comparison')
-    parser.add_argument('--verbose', action='store_true', help='Show detailed progress')
-    
-    args = parser.parse_args()
-
-    # Validate arguments
-    if not args.output.endswith('.html'):
-        logging.error("Output file must have .html extension")
-        sys.exit(1)
-
-    valid_tests = {'schema', 'count', 'duplicates', 'nulls', 'data', 'all'}
-    selected_tests = args.tests.lower().split(',')
-    if 'all' in selected_tests:
-        selected_tests = ['schema', 'count', 'duplicates', 'nulls', 'data']
-    if not all(t in valid_tests for t in selected_tests):
-        logging.error(f"Invalid test specified. Choose from: {', '.join(valid_tests)}")
-        sys.exit(1)
-
-    try:
-        # Load config
-        if args.verbose:
-            logging.info("Loading configuration...")
-        config = load_config(args.config_file)
+class Validator:
+    def __init__(self, config, output_path, tests='all', sample_size=100, verbose=False):
+        """
+        Initialize Validator V2.0
         
-        # Initialize results
-        results = {
-            'total_tables': len(config['mappings']),
-            'tests': {}
-        }
-
-        # Run selected tests
-        if 'schema' in selected_tests:
-            if args.verbose:
-                logging.info("Running schema comparison...")
-            comparator = SchemaComparator(args)
-            results['tests']['schema'] = comparator.compare_schemas(config['mappings'])
-
-        if 'count' in selected_tests:
-            if args.verbose:
-                logging.info("Running count check...")
-            checker = CountChecker(args)
-            results['tests']['count'] = checker.check_counts(config['mappings'])
-
-        if 'duplicates' in selected_tests:
-            if args.verbose:
-                logging.info("Running duplicate check...")
-            checker = DuplicateChecker(args)
-            results['tests']['duplicates'] = checker.check_duplicates(config['mappings'])
-
-        if 'nulls' in selected_tests:
-            if args.verbose:
-                logging.info("Running null check...")
-            checker = NullChecker(args)
-            results['tests']['nulls'] = checker.check_nulls(config['mappings'])
-
-        if 'data' in selected_tests:
-            if args.verbose:
-                logging.info("Running data comparison...")
-            comparator = DataComparator(args)
-            results['tests']['data'] = comparator.compare_data(config['mappings'], args.sample_size)
-
-        # Generate report
-        if args.verbose:
-            logging.info("Generating report...")
-        reporter = ReportGenerator()
-        reporter.generate(results, args.output)
+        Args:
+            config (dict): Configuration dictionary containing connection details and mappings.
+            output_path (str): Path to save the HTML report.
+            tests (str): Comma-separated list of tests to run (or 'all').
+            sample_size (int): Number of rows to sample for data comparison.
+            verbose (bool): Enable verbose logging.
+        """
+        self.config = config
+        self.output_path = output_path
+        self.sample_size = sample_size
+        self.verbose = verbose
         
-        logging.info(f"Validation complete! Report saved to {args.output}")
+        # Parse and validate tests
+        valid_tests = {'schema', 'count', 'duplicates', 'nulls', 'data', 'all'}
+        self.selected_tests = tests.lower().split(',')
+        if 'all' in self.selected_tests:
+            self.selected_tests = ['schema', 'count', 'duplicates', 'nulls', 'data']
         
-    except Exception as e:
-        logging.error(f"Fatal error: {str(e)}")
-        sys.exit(1)
+        if not all(t in valid_tests for t in self.selected_tests):
+            raise ValueError(f"Invalid test specified. Choose from: {', '.join(valid_tests)}")
 
-if __name__ == "__main__":
-    main()
+        # Construct 'args' object for sub-modules
+        # Note: 'mssql_schema' is explicitly REMOVED in V2.0
+        self.args = type('Args', (), {
+            'aws_region': config.get('aws-region'),
+            's3_staging': config.get('s3-staging'),
+            'athena_db': config.get('athena-db'),
+            'athena_workgroup': config.get('athena-workgroup', 'primary'),
+            'mssql_server': config.get('mssql-server'),
+            'mssql_db': config.get('mssql-db'),
+            'mssql_driver': config.get('mssql-driver', 'ODBC Driver 17 for SQL Server'),
+            'mssql_user': config.get('mssql-user'),      # Optional: for SQL Auth
+            'mssql_password': config.get('mssql-password'), # Optional: for SQL Auth
+            'output': output_path
+        })()
+
+    def run(self):
+        """Execute the validation suite"""
+        try:
+            results = {
+                'total_tables': len(self.config['mappings']),
+                'tests': {}
+            }
+
+            # 1. Schema Comparison
+            if 'schema' in self.selected_tests:
+                if self.verbose: logging.info("Running schema comparison...")
+                comparator = SchemaComparator(self.args)
+                results['tests']['schema'] = comparator.compare_schemas(self.config['mappings'])
+
+            # 2. Row Count Check
+            if 'count' in self.selected_tests:
+                if self.verbose: logging.info("Running count check...")
+                checker = CountChecker(self.args)
+                results['tests']['count'] = checker.check_counts(self.config['mappings'])
+
+            # 3. Duplicate Check
+            if 'duplicates' in self.selected_tests:
+                if self.verbose: logging.info("Running duplicate check...")
+                checker = DuplicateChecker(self.args)
+                results['tests']['duplicates'] = checker.check_duplicates(self.config['mappings'])
+
+            # 4. Null Check
+            if 'nulls' in self.selected_tests:
+                if self.verbose: logging.info("Running null check...")
+                checker = NullChecker(self.args)
+                results['tests']['nulls'] = checker.check_nulls(self.config['mappings'])
+
+            # 5. Data Comparison
+            if 'data' in self.selected_tests:
+                if self.verbose: logging.info("Running data comparison...")
+                comparator = DataComparator(self.args)
+                results['tests']['data'] = comparator.compare_data(self.config['mappings'], self.sample_size)
+
+            # Generate Report
+            if self.verbose: logging.info("Generating HTML report...")
+            reporter = ReportGenerator()
+            reporter.generate(results, self.output_path)
+            
+            return True, f"Validation complete! Report saved to {self.output_path}"
+            
+        except Exception as e:
+            logging.error(f"Fatal error during validation: {str(e)}", exc_info=True)
+            return False, str(e)

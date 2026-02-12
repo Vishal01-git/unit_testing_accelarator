@@ -1,83 +1,91 @@
-# web_ui.py
+# app.py
 from flask import Flask, render_template, request, jsonify, send_from_directory
-import subprocess
 import os
-import json
-import html
+import uuid
+import logging
+from unit_test_validator import Validator  # Importing our V2 class
 
 app = Flask(__name__)
-
-# Get the directory where this script is located
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+REPORTS_DIR = os.path.join(PROJECT_DIR, 'reports')
+
+# Ensure reports directory exists
+if not os.path.exists(REPORTS_DIR):
+    os.makedirs(REPORTS_DIR)
+
+# Configure Flask logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 @app.route('/')
 def index():
     """Renders the main UI page."""
     return render_template('index.html')
 
-# --- NEW: Route to serve the generated report ---
-@app.route('/report')
-def report():
-    """Serves the generated report.html file."""
-    return send_from_directory(PROJECT_DIR, 'report.html')
-# --- End of new section ---
+@app.route('/reports/<filename>')
+def report(filename):
+    """Serves the generated report file securely."""
+    return send_from_directory(REPORTS_DIR, filename)
 
 @app.route('/run_script', methods=['POST'])
 def run_script():
     """
-    Receives form data, creates the config.json, runs the original
-    unit_test_validator.py script, and returns its output.
+    V2.0 Endpoint: Receives JSON config, initializes Validator class, and runs tests.
     """
     try:
         data = request.json
         
-        config_file_path = os.path.join(PROJECT_DIR, 'config.json')
-        config_data = {"mappings": data.get('mappings', {})} 
+        # 1. Basic Validation
+        # Note: 'mssql-schema' is intentionally excluded
+        required_fields = ['aws-region', 'athena-db', 'mssql-server', 'mssql-db', 'mappings']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                return jsonify({'status': 'error', 'output': f"Missing required field: {field}"})
+
+        # 2. Concurrency Handling
+        # Generate a unique ID for this specific run
+        run_id = str(uuid.uuid4())
+        report_filename = f"report_{run_id}.html"
+        report_file_path = os.path.join(REPORTS_DIR, report_filename)
+
+        # 3. Construct Configuration Dictionary
+        config = {
+            "aws-region": data['aws-region'],
+            "s3-staging": data['s3-staging'],
+            "athena-db": data['athena-db'],
+            "athena-workgroup": data.get('athena-workgroup', 'primary'),
+            "mssql-server": data['mssql-server'],
+            "mssql-db": data['mssql-db'],
+            "mssql-driver": data.get('mssql-driver', 'ODBC Driver 17 for SQL Server'),
+            "mappings": data.get('mappings', {})
+        }
+
+        # 4. Initialize and Run Validator
+        validator = Validator(
+            config=config, 
+            output_path=report_file_path,
+            tests=data.get('tests', 'all'),
+            sample_size=100,  # Default sample size
+            verbose=True
+        )
         
-        with open(config_file_path, 'w') as f:
-            json.dump(config_data, f, indent=4)
+        success, message = validator.run()
 
-        validator_script_path = os.path.join(PROJECT_DIR, 'unit_test_validator.py')
-        report_file_path = os.path.join(PROJECT_DIR, 'report.html')
-
-        command = [
-            data['pythonPath'],
-            validator_script_path,
-            '--aws-region', data['aws-region'],
-            '--s3-staging', data['s3-staging'],
-            '--athena-db', data['athena-db'],
-            '--athena-workgroup', data['athena-workgroup'],
-            '--mssql-server', data['mssql-server'],
-            '--mssql-db', data['mssql-db'],
-            '--mssql-schema', data['mssql-schema'],
-            '--config-file', config_file_path,
-            '--output', report_file_path,
-            '--tests', data['tests']
-        ]
-
-        result = subprocess.run(command, capture_output=True, text=True, check=False)
-
-        stdout = html.escape(result.stdout)
-        stderr = html.escape(result.stderr)
-
-        if result.returncode == 0:
+        if success:
             return jsonify({
                 'status': 'success',
-                'output': stdout if stdout else "Script executed successfully with no output.",
-                # --- MODIFIED: Return the new /report URL ---
-                'report_url': '/report'
+                'output': message,
+                'report_url': f'/reports/{report_filename}'
             })
         else:
             return jsonify({
                 'status': 'error',
-                'output': f"STDOUT:\n{stdout}\n\nSTDERR:\n{stderr}"
+                'output': f"Validation Failed: {message}"
             })
 
     except Exception as e:
-        return jsonify({'status': 'error', 'output': f"An unexpected error occurred in the web server: {str(e)}"})
+        logger.error(f"Server error: {e}", exc_info=True)
+        return jsonify({'status': 'error', 'output': f"An unexpected error occurred: {str(e)}"})
 
 if __name__ == '__main__':
-    templates_dir = os.path.join(PROJECT_DIR, 'templates')
-    if not os.path.exists(templates_dir):
-        os.makedirs(templates_dir)
     app.run(debug=True, port=5001)
