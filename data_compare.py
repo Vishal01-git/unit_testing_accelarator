@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Data Comparison Module V2.0 (Vectorized)
+Data Comparison Module V3.2 (Auto-Sort Support)
 """
 
 import pandas as pd
@@ -10,21 +10,23 @@ import pyodbc
 import logging
 import re
 import os
-from typing import Dict, List
+import xlsxwriter
+from typing import Dict, List, Optional
 from schema_compare import SchemaComparator
 from datetime import datetime
 
 class DataComparator:
     def __init__(self, args):
         self.args = args
+        self.report_dir = os.path.dirname(self.args.output)
         
     def normalize_name(self, name: str) -> str:
-        """Standardize names (removes schema for pure name match)"""
+        """Standardize names"""
         name = str(name).split('.')[-1]
         return re.sub(r'[^a-z0-9_]', '', name.lower().strip())
 
-    def get_athena_data(self, table: str, columns: List[str], primary_keys: List[str], sample_size: int) -> pd.DataFrame:
-        """Fetch sample data from Athena"""
+    def get_athena_data(self, table: str, columns: List[str], order_by_cols: List[str], sample_size: int) -> pd.DataFrame:
+        """Fetch sample data from Athena with dynamic ordering"""
         try:
             conn = connect(
                 region_name=self.args.aws_region,
@@ -34,46 +36,49 @@ class DataComparator:
                 cursor_class=PandasCursor
             )
             
-            # Qualify columns
             qualified_cols = [f'"{col}"' for col in columns]
             col_list = ', '.join(qualified_cols)
             
-            # Order by PKs for consistent sampling
-            order_by = ', '.join([f'"{pk}"' for pk in primary_keys])
+            # Use provided columns for sorting
+            order_clause = ', '.join([f'"{col}"' for col in order_by_cols])
             
             query = f"""
                 SELECT {col_list} 
                 FROM "{self.args.athena_db}"."{table}"
-                ORDER BY {order_by} 
+                ORDER BY {order_clause} 
                 LIMIT {sample_size}
             """
             
             df = conn.cursor().execute(query).as_pandas()
-            
-            # Normalize for comparison
-            for col in df.columns:
-                df[col] = df[col].astype(str).str.strip().replace(['nan', 'None', '<NA>'], 'NULL')
-            
             return df
         except Exception as e:
             logging.error(f"Athena fetch failed for {table}: {e}")
             raise
 
-    def get_sqlserver_data(self, table_str: str, columns: List[str], primary_keys: List[str], sample_size: int) -> pd.DataFrame:
-        """Fetch sample data from SQL Server (handles schema.table)"""
+    def get_sqlserver_data(self, table_str: str, columns: List[str], order_by_cols: List[str], sample_size: int) -> pd.DataFrame:
+        """Fetch sample data from SQL Server with dynamic ordering"""
         try:
-            mssql_username = "admin-airliquide-sas-big-prod-sql-apac-001"
-            mssql_password = "QAXwmFTaa35S94Y9"
             conn_str = (
                 "Driver={ODBC Driver 17 for SQL Server};"
                 f"Server={self.args.mssql_server};"
                 f"Database={self.args.mssql_db};"
-                f"UID={mssql_username};"
-                f"PWD={mssql_password};"
-                "Encrypt=yes;"
+                "UID=;PWD=;"
+                "Authentication=ActiveDirectoryInteractive;"
+                # "Encrypt=yes;"
             )
+            logging.info("Initiating SQL Server connection with MFA...")
+        # try:
+        #     mssql_username = "admin-airliquide-sas-big-prod-sql-apac-001"
+        #     mssql_password = "QAXwmFTaa35S94Y9"
+        #     conn_str = (
+        #         "Driver={ODBC Driver 17 for SQL Server};"
+        #         f"Server={self.args.mssql_server};"
+        #         f"Database={self.args.mssql_db};"
+        #         f"UID={mssql_username};"
+        #         f"PWD={mssql_password};"
+        #         "Encrypt=yes;"
+        #     )
             
-            # V2.0: Parse schema.table
             if '.' in table_str:
                 schema, table = table_str.split('.', 1)
             else:
@@ -84,79 +89,67 @@ class DataComparator:
                 quoted_cols = [f'[{col}]' for col in columns]
                 col_list = ', '.join(quoted_cols)
                 
-                quoted_pks = [f'[{pk}]' for pk in primary_keys]
-                order_by = ', '.join(quoted_pks)
+                quoted_order = [f'[{col}]' for col in order_by_cols]
+                order_clause = ', '.join(quoted_order)
                 
                 query = f"""
                     SELECT TOP {sample_size} {col_list} 
                     FROM [{schema}].[{table}] 
-                    ORDER BY {order_by}
+                    ORDER BY {order_clause}
                 """
                 
                 df = pd.read_sql(query, conn)
-                
-                # Normalize for comparison
-                for col in df.columns:
-                    df[col] = df[col].astype(str).str.strip().replace(['nan', 'None', '<NA>'], 'NULL')
-                    
                 return df
         except Exception as e:
             logging.error(f"SQL Server fetch failed for {table_str}: {e}")
             raise
 
-    def compare_dataframes(self, athena_df: pd.DataFrame, sql_df: pd.DataFrame, 
-                         athena_cols: List[str], sql_cols: List[str], 
-                         primary_keys: List[str]) -> List[Dict]:
-        """Vectorized Comparison"""
-        mismatches = []
-        
-        # 1. Row Count check
-        if len(athena_df) != len(sql_df):
-            return [{'issue_type': 'row_count', 'message': f"Row count mismatch (Ath: {len(athena_df)}, SQL: {len(sql_df)})"}]
-        
-        if len(athena_df) == 0:
-            return []
-
-        # 2. Alignment
+    def generate_excel_report(self, df_src: pd.DataFrame, df_tgt: pd.DataFrame, filename: str) -> str:
+        """Generates the Excel report"""
         try:
-            # Set index to PKs for alignment
-            athena_df = athena_df.set_index(primary_keys).sort_index()
-            sql_df = sql_df.set_index(primary_keys).sort_index()
-            
-            # Rename SQL cols to match Athena cols
-            sql_df.columns = athena_df.columns
-            
-        except KeyError as e:
-            return [{'issue_type': 'pk_error', 'message': f"Primary key mismatch or missing column: {e}"}]
-
-        # 3. Vectorized Diff
-        # Create boolean mask where values differ
-        ne_stacked = (athena_df != sql_df).stack()
-        changed = ne_stacked[ne_stacked]
-        
-        # 4. Extract details
-        for index, col in changed.index:
-            ath_val = athena_df.loc[index, col]
-            sql_val = sql_df.loc[index, col]
-            
-            # Formatting the PK for display (it's a tuple if multiple keys, scalar if one)
-            pk_display = str(index)
-            
-            mismatches.append({
-                'row': pk_display,
-                'column': col,
-                'athena_value': ath_val,
-                'sql_value': sql_val,
-                'message': f"Mismatch at PK {pk_display}, Col '{col}': '{ath_val}' != '{sql_val}'"
-            })
-            
-            if len(mismatches) > 500:
-                mismatches.append({'message': 'Mismatch limit reached (500+)'})
-                break
+            if not os.path.exists(self.report_dir):
+                os.makedirs(self.report_dir)
                 
-        return mismatches
+            file_path = os.path.join(self.report_dir, filename)
+            writer = pd.ExcelWriter(file_path, engine='xlsxwriter')
+            workbook = writer.book
 
-    def compare_data(self, mappings: Dict, sample_size: int = 100) -> Dict:
+            df_src.to_excel(writer, sheet_name='Source_Data', index=False)
+            df_tgt.to_excel(writer, sheet_name='Target_Data', index=False)
+
+            ws_val = workbook.add_worksheet('Validation_Check')
+            writer.sheets['Validation_Check'] = ws_val
+            
+            headers = df_src.columns.tolist()
+            header_fmt = workbook.add_format({'bold': True, 'bg_color': '#D3D3D3', 'border': 1})
+            
+            for idx, val in enumerate(headers):
+                ws_val.write(0, idx, val, header_fmt)
+
+            green_fmt = workbook.add_format({'bg_color': '#C6EFCE', 'font_color': '#006100'})
+            red_fmt = workbook.add_format({'bg_color': '#FFC7CE', 'font_color': '#9C0006'})
+            
+            num_rows = len(df_src)
+            num_cols = len(headers)
+            
+            for row in range(1, num_rows + 1):
+                for col in range(num_cols):
+                    cell_ref = xlsxwriter.utility.xl_rowcol_to_cell(row, col)
+                    ws_val.write_formula(row, col, f'=Source_Data!{cell_ref}=Target_Data!{cell_ref}')
+
+            if num_rows > 0 and num_cols > 0:
+                last_col = xlsxwriter.utility.xl_col_to_name(num_cols - 1)
+                rng = f"A2:{last_col}{num_rows + 1}"
+                ws_val.conditional_format(rng, {'type': 'cell', 'criteria': '==', 'value': True, 'format': green_fmt})
+                ws_val.conditional_format(rng, {'type': 'cell', 'criteria': '==', 'value': False, 'format': red_fmt})
+
+            writer.close()
+            return filename
+        except Exception as e:
+            logging.error(f"Excel generation failed: {e}")
+            raise
+
+    def compare_data(self, mappings: Dict, sample_size: int = 1000) -> Dict:
         """Main comparison flow"""
         results = {
             'timestamp': datetime.now().isoformat(),
@@ -166,11 +159,8 @@ class DataComparator:
             'tables': []
         }
         
-        # Helper to get valid column pairs
         schema_comparator = SchemaComparator(self.args)
         athena_df_meta = schema_comparator.get_athena_columns()
-        
-        # We need a list of SQL tables for the batch fetch in schema comparator
         sql_targets = [m['sql_table'] for m in mappings.values()]
         sql_df_meta = schema_comparator.get_sqlserver_columns(sql_targets)
         
@@ -183,76 +173,109 @@ class DataComparator:
                 'athena_name': athena_table,
                 'sql_name': sql_table,
                 'status': 'Pending',
+                'has_issues': False,
                 'issues': [],
-                'mismatches': []
+                'excel_report': None,
+                'mismatch_count': 0
             }
             
             try:
-                if not primary_keys:
-                    raise ValueError("No primary keys defined")
-
-                # Normalize table names for meta-lookup
+                # --- 1. Column Resolution ---
                 norm_athena = self.normalize_name(athena_table)
-                norm_sql_table = self.normalize_name(sql_table) # Extracts table name from schema.table
+                norm_sql_table = self.normalize_name(sql_table)
                 
-                # Filter meta DFs
                 athena_cols = athena_df_meta[athena_df_meta['normalized_table_name'] == norm_athena]
                 sql_cols = sql_df_meta[sql_df_meta['normalized_table_name'] == norm_sql_table]
                 
                 if athena_cols.empty or sql_cols.empty:
-                    raise ValueError("Could not fetch schema metadata for comparison")
+                    raise ValueError("Could not fetch schema metadata")
 
-                # Find common columns
-                common_norm_names = set(athena_cols['normalized_name']) & set(sql_cols['normalized_name'])
+                # Find common normalized names
+                common_norm_names = sorted(list(set(athena_cols['normalized_name']) & set(sql_cols['normalized_name'])))
                 
-                # Build fetch lists
-                fetch_athena_cols = []
-                fetch_sql_cols = []
-                
-                for norm in common_norm_names:
-                    # Skip PKs in this list, we'll add them specifically
-                    # (This implementation logic can vary, simpler to just re-add PKs if missing or handle duplicates)
-                    pass
-
-                # Simplified column selection:
-                # 1. Map normalized -> actual name for both
                 ath_map = dict(zip(athena_cols['normalized_name'], athena_cols['column_name']))
                 sql_map = dict(zip(sql_cols['normalized_name'], sql_cols['column_name']))
                 
                 final_athena_cols = []
                 final_sql_cols = []
                 
-                # Ensure PKs are included first
+                # If PKs provided, check them
                 for pk in primary_keys:
                     norm_pk = self.normalize_name(pk)
-                    if norm_pk in ath_map and norm_pk in sql_map:
-                        pass # Valid
-                    else:
-                        raise ValueError(f"Primary Key {pk} not found in both tables")
+                    if norm_pk not in ath_map or norm_pk not in sql_map:
+                         raise ValueError(f"Primary Key {pk} not found in both tables")
                 
-                # Add all common columns
+                # Build column lists
                 for norm in common_norm_names:
                     final_athena_cols.append(ath_map[norm])
                     final_sql_cols.append(sql_map[norm])
                 
-                # Fetch
-                df_ath = self.get_athena_data(athena_table, final_athena_cols, primary_keys, sample_size)
-                df_sql = self.get_sqlserver_data(sql_table, final_sql_cols, primary_keys, sample_size)
-                
-                # Compare
-                mismatches = self.compare_dataframes(df_ath, df_sql, final_athena_cols, final_sql_cols, primary_keys)
-                
-                if mismatches:
-                    table_result['status'] = 'Mismatch'
-                    table_result['issues'].append(f"Found {len(mismatches)} data mismatches")
-                    table_result['mismatches'] = mismatches
-                    results['error_tables'] += 1
+                # --- 2. Determine Sort Columns ---
+                if primary_keys:
+                    # Sort by defined PKs
+                    athena_sort = primary_keys
+                    sql_sort = primary_keys
                 else:
+                    # No PK? Sort by ALL common columns
+                    athena_sort = final_athena_cols
+                    sql_sort = final_sql_cols
+
+                # --- 3. Fetch Data ---
+                df_ath = self.get_athena_data(athena_table, final_athena_cols, athena_sort, sample_size)
+                df_sql = self.get_sqlserver_data(sql_table, final_sql_cols, sql_sort, sample_size)
+                
+                # --- 4. Align Data ---
+                # Normalize values
+                df_ath = df_ath.astype(str).apply(lambda x: x.str.strip().replace(['nan', 'None', '<NA>'], 'NULL'))
+                df_sql = df_sql.astype(str).apply(lambda x: x.str.strip().replace(['nan', 'None', '<NA>'], 'NULL'))
+
+                if not df_ath.empty and not df_sql.empty:
+                    if primary_keys:
+                        # If PKs exist, align on them
+                        df_ath = df_ath.set_index(primary_keys).sort_index()
+                        df_sql = df_sql.set_index(primary_keys).sort_index()
+                    else:
+                        # No PKs: Trust the SQL 'ORDER BY' and reset index to 0..N for row-by-row comparison
+                        df_ath = df_ath.reset_index(drop=True)
+                        df_sql = df_sql.reset_index(drop=True)
+                    
+                    # Ensure columns match for report
+                    df_sql.columns = df_ath.columns
+                    
+                    # Align rows
+                    common_index = df_ath.index.intersection(df_sql.index)
+                    df_ath = df_ath.loc[common_index]
+                    df_sql = df_sql.loc[common_index]
+                
+                # --- 5. Comparison ---
+                if df_ath.equals(df_sql):
                     table_result['status'] = 'Match'
+                    table_result['has_issues'] = False
                     results['valid_tables'] += 1
+                else:
+                    table_result['status'] = 'Mismatch'
+                    table_result['has_issues'] = True
+                    results['error_tables'] += 1
+                    try:
+                        diff = df_ath.compare(df_sql)
+                        table_result['mismatch_count'] = len(diff)
+                    except ValueError:
+                         table_result['mismatch_count'] = "Structure Mismatch"
+
+                # --- 6. Generate Excel Report ---
+                excel_filename = f"validation_{self.normalize_name(athena_table)}_{datetime.now().strftime('%H%M%S')}.xlsx"
+                
+                self.generate_excel_report(
+                    df_ath.reset_index(), 
+                    df_sql.reset_index(), 
+                    excel_filename
+                )
+                
+                table_result['excel_report'] = excel_filename
                     
             except Exception as e:
                 table_result['status'] = 'Error'
+                table_result['has_issues'] = True
                 table_result['issues'].append(str(e))
                 results['error_tables'] += 1
             

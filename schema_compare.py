@@ -108,8 +108,8 @@ class SchemaComparator:
             logging.info("Initiating SQL Server connection with MFA...")
 
         # try:
-        #     mssql_username = ""
-        #     mssql_password = ""
+        #     mssql_username = "azuredorothy"
+        #     mssql_password = "C198280ECC"
         #     conn_str = (
         #         "Driver={ODBC Driver 17 for SQL Server};"
         #         f"Server={self.args.mssql_server};"

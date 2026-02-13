@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from datetime import datetime
 import dominate
-from dominate.tags import div, h1, h2, h3, h4, p, span, strong, ul, li, table, thead, tbody, tr, th, td, meta, link, style, script, details, summary
+from dominate.tags import div, h1, h2, h3, h4, p, span, strong, ul, li, table, thead, tbody, tr, th, td, meta, link, style, script, details, summary, a, i
 import logging
 
 class ReportGenerator:
@@ -70,12 +70,14 @@ class ReportGenerator:
                 with div(cls="test-section"):
                     h3(f"{test_type.capitalize()} Test Results")
                     for table_result in test_results['tables']:
-                        with div(cls=f"table-card {'error' if table_result['has_issues'] else 'match'}"):
+                        with div(cls=f"table-card {'error' if table_result['has_issues'] or table_result.get('status') == 'Mismatch' else 'match'}"):
                             with details():
                                 with summary(cls="table-header"):
                                     strong(f"{table_result['athena_name']} ↔ {table_result['sql_name']}")
                                     if table_result['has_issues']:
                                         span(f"{len(table_result['issues'])} issues", cls="badge badge-danger")
+                                    elif table_result.get('status') == 'Mismatch':
+                                        span(f"Mismatch Found", cls="badge badge-danger")
                                     span("▶", cls="toggle-icon")
                                 
                                 with div(cls="table-details"):
@@ -174,22 +176,22 @@ class ReportGenerator:
 
     def _build_data_results(self, table_result):
         with div(cls="data-section"):
-            h4("Data Comparison")
-            with table(cls="schema-table"):
-                with thead():
-                    with tr():
-                        th("Row")
-                        th("Column")
-                        th("Athena Value")
-                        th("SQL Server Value")
-                with tbody():
-                    if not table_result['mismatches']:
-                        with tr(cls="match"):
-                            td(colspan=4, cls="text-center")("No mismatches found")
-                    else:
-                        for mismatch in table_result['mismatches']:
-                            with tr(cls="error"):
-                                td(str(mismatch['row']))
-                                td(mismatch['column'])
-                                td(mismatch['athena_value'])
-                                td(mismatch['sql_value'])
+            h4("Sample Data Comparison")
+            
+            # Display Status and Mismatch Count
+            with div(style="margin-bottom: 15px;"):
+                if table_result['status'] == 'Match':
+                    span("Status: MATCH", cls="badge badge-success", style="font-size: 14px; margin-right: 10px;")
+                else:
+                    span("Status: MISMATCH", cls="badge badge-danger", style="font-size: 14px; margin-right: 10px;")
+                    span(f"Mismatched Rows: {table_result['mismatch_count']}", style="font-weight: bold; color: #dc3545;")
+
+            # Download Link for Excel
+            if table_result.get('excel_report'):
+                # Assuming app.py serves /reports/<filename>
+                report_url = f"/reports/{table_result['excel_report']}"
+                with a(href=report_url, cls="report-btn download", style="background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;"):
+                    i(cls="fa fa-file-excel", style="margin-right: 8px;")
+                    span("Download Validation Excel")
+            else:
+                p("No Excel report generated.")
