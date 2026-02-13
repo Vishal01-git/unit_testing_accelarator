@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unit Test Validator</title>
+    <title>Unit Test Validator V2.0</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -200,14 +200,9 @@
         }
 
         .generated-path {
-            background-color: var(--input-background);
-            padding: 8px 12px;
-            border-radius: 4px;
+            /* Kept the styling similar but it's now an input */
             font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
             font-size: 0.9em;
-            word-break: break-all;
-            margin-top: 5px;
-            border: 1px solid var(--border-color);
         }
 
         .error-message {
@@ -224,7 +219,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Unit Testing Validator</h1>
+            <h1>Unit Testing Validator V2.0</h1>
             <p>A unified interface to configure and run your data validation suite.</p>
         </div>
 
@@ -241,9 +236,7 @@
         <div class="card">
             <h2 class="section-title">Execution Parameters</h2>
             <div class="form-grid">
-                <div class="form-group" style="grid-column: 1 / -1;"><label for="pythonPath">Path to Python in venv</label><input type="text" id="pythonPath" value="venv\Scripts\python.exe"></div>
                 <div class="form-group"><label for="aws-region">AWS Region</label><input type="text" id="aws-region" value="ap-southeast-1"></div>
-                <div class="form-group"><label for="mssql-schema">SQL Schema</label><input type="text" id="mssql-schema" placeholder="e.g stg,dmt,salesbi"></div>
                 <div class="form-group" style="grid-column: 1 / -1;"><label for="tests">Tests to Run</label><input type="text" id="tests" value="schema,count"></div>
             </div>
         </div>
@@ -256,8 +249,8 @@
                     <textarea id="athena-tables" placeholder="athena_table1, athena_table2"></textarea>
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1;">
-                    <label for="sql-tables">SQL Server Tables (in corresponding order)</label>
-                    <textarea id="sql-tables" placeholder="sql_table1, sql_table2"></textarea>
+                    <label for="sql-tables">SQL Server Tables (schema.table format)</label>
+                    <textarea id="sql-tables" placeholder="dbo.sql_table1, sales.sql_table2"></textarea>
                 </div>
                  <div class="form-group" style="grid-column: 1 / -1;">
                     <label for="primary-keys">Primary Keys (optional, comma-separated for tables, semicolon-separated for multiple keys)</label>
@@ -267,13 +260,13 @@
         </div>
 
         <div class="card">
-            <h2 class="section-title">Generated Paths (Read-Only)</h2>
+            <h2 class="section-title">Generated Paths (Editable)</h2>
             <div class="form-grid">
-                <div class="form-group"><label>S3 Staging</label><div id="s3-staging-path" class="generated-path"></div></div>
-                <div class="form-group"><label>Athena DB</label><div id="athena-db-path" class="generated-path"></div></div>
-                <div class="form-group"><label>Athena Workgroup</label><div id="athena-workgroup-path" class="generated-path"></div></div>
-                <div class="form-group"><label>SQL Server</label><div id="mssql-server-path" class="generated-path"></div></div>
-                <div class="form-group"><label>SQL DB</label><div id="mssql-db-path" class="generated-path"></div></div>
+                <div class="form-group"><label>S3 Staging</label><input type="text" id="s3-staging-path" class="generated-path"></div>
+                <div class="form-group"><label>Athena DB</label><input type="text" id="athena-db-path" class="generated-path"></div>
+                <div class="form-group"><label>Athena Workgroup</label><input type="text" id="athena-workgroup-path" class="generated-path"></div>
+                <div class="form-group"><label>SQL Server</label><input type="text" id="mssql-server-path" class="generated-path"></div>
+                <div class="form-group"><label>SQL DB</label><input type="text" id="mssql-db-path" class="generated-path"></div>
             </div>
         </div>
         
@@ -296,12 +289,15 @@
             const initiative = document.getElementById('initiative').value;
             const name = document.getElementById('name').value;
             const layer = document.getElementById('layer').value;
-            document.getElementById('s3-staging-path').textContent = `s3://al-gdo-${env}-ap-dl-${initiative}-formatted-p/`;
-            document.getElementById('athena-db-path').textContent = `${env}_bi_ap_${initiative}_${layer}_${name}`;
-            document.getElementById('athena-workgroup-path').textContent = `${initiative}-workgroup`;
-            document.getElementById('mssql-server-path').textContent = `al-sas-big-${sqlEnv}-sql-${name}-01.database.windows.net`;
-            document.getElementById('mssql-db-path').textContent = `al-sas-big-${sqlEnv}-sql-${name}-01-db-01`;
+            
+            // Using .value now to support input fields
+            document.getElementById('s3-staging-path').value = `s3://al-gdo-${env}-ap-dl-${initiative}-formatted-p/`;
+            document.getElementById('athena-db-path').value = `${env}_bi_ap_${initiative}_${layer}_${name}`;
+            document.getElementById('athena-workgroup-path').value = `${initiative}-workgroup`;
+            document.getElementById('mssql-server-path').value = `al-sas-big-${sqlEnv}-sql-${name}-01.database.windows.net`;
+            document.getElementById('mssql-db-path').value = `al-sas-big-${sqlEnv}-sql-${name}-01-db-01`;
         }
+        
         document.addEventListener('DOMContentLoaded', updatePaths);
 
         document.getElementById('run-btn').addEventListener('click', async () => {
@@ -333,24 +329,17 @@
                 mappings[athenaTable] = { "sql_table": sqlTable, "primary_keys": primaryKeys };
             }
 
+            // Updated to read from .value instead of .textContent
             const payload = {
-                "pythonPath": document.getElementById('pythonPath').value,
                 "aws-region": document.getElementById('aws-region').value,
-                "s3-staging": document.getElementById('s3-staging-path').textContent,
-                "athena-db": document.getElementById('athena-db-path').textContent,
-                "athena-workgroup": document.getElementById('athena-workgroup-path').textContent,
-                "mssql-server": document.getElementById('mssql-server-path').textContent,
-                "mssql-db": document.getElementById('mssql-db-path').textContent,
-                "mssql-schema": document.getElementById('mssql-schema').value,
+                "s3-staging": document.getElementById('s3-staging-path').value,
+                "athena-db": document.getElementById('athena-db-path').value,
+                "athena-workgroup": document.getElementById('athena-workgroup-path').value,
+                "mssql-server": document.getElementById('mssql-server-path').value,
+                "mssql-db": document.getElementById('mssql-db-path').value,
                 "tests": document.getElementById('tests').value,
                 "mappings": mappings
             };
-
-            if (!payload.pythonPath) {
-                outputDiv.innerHTML = `<span class="error-message">Error: Please provide the path to the Python executable in your virtual environment.</span>`;
-                spinner.style.display = 'none';
-                return;
-            }
 
             try {
                 const response = await fetch('/run_script', {
@@ -363,7 +352,6 @@
                 if (result.status === 'success') {
                     outputDiv.innerHTML = result.output;
                     if(result.report_url) {
-                        // Create the View and Download links
                         const viewLink = `<a href="${result.report_url}" target="_blank" class="report-btn view">View Report</a>`;
                         const downloadLink = `
                             <a href="${result.report_url}" class="report-btn download" download="validation_report.html" title="Download Report">
