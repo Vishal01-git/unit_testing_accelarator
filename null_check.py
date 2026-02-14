@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Null Check Module V2.0
+Null Check Module V2.1
 """
 
 import pandas as pd
@@ -40,18 +40,25 @@ class NullChecker:
     def get_sqlserver_nulls(self, table_str: str, primary_keys: list) -> dict:
         """Check for nulls in SQL Server primary key columns"""
         try:
-            mssql_username = "admin-airliquide-sas-big-prod-sql-apac-001"
-            mssql_password = "QAXwmFTaa35S94Y9"
-            conn_str = (
-                "Driver={ODBC Driver 17 for SQL Server};"
-                f"Server={self.args.mssql_server};"
-                f"Database={self.args.mssql_db};"
-                f"UID={mssql_username};"
-                f"PWD={mssql_password};"
-                "Encrypt=yes;"
-            )
+            # V2.1: Dynamic Authentication
+            if self.args.auth_method == 'mfa':
+                conn_str = (
+                    f"Driver={{{self.args.mssql_driver}}};"
+                    f"Server={self.args.mssql_server};"
+                    f"Database={self.args.mssql_db};"
+                    f"UID={self.args.mssql_user};"
+                    "Authentication=ActiveDirectoryInteractive;"
+                )
+            else:
+                conn_str = (
+                    f"Driver={{{self.args.mssql_driver}}};"
+                    f"Server={self.args.mssql_server};"
+                    f"Database={self.args.mssql_db};"
+                    f"UID={self.args.mssql_user};"
+                    f"PWD={self.args.mssql_password};"
+                )
             
-            # V2.0: Parse schema.table
+            # Parse schema.table
             if '.' in table_str:
                 schema, table = table_str.split('.', 1)
             else:

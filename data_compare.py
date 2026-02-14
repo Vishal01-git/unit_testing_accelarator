@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Data Comparison Module V3.2 (Auto-Sort Support)
+Data Comparison Module V3.3 (Fix for PK Case Sensitivity)
 """
 
 import pandas as pd
@@ -11,7 +11,7 @@ import logging
 import re
 import os
 import xlsxwriter
-from typing import Dict, List, Optional
+from typing import Dict, List
 from schema_compare import SchemaComparator
 from datetime import datetime
 
@@ -21,12 +21,10 @@ class DataComparator:
         self.report_dir = os.path.dirname(self.args.output)
         
     def normalize_name(self, name: str) -> str:
-        """Standardize names"""
         name = str(name).split('.')[-1]
         return re.sub(r'[^a-z0-9_]', '', name.lower().strip())
 
     def get_athena_data(self, table: str, columns: List[str], order_by_cols: List[str], sample_size: int) -> pd.DataFrame:
-        """Fetch sample data from Athena with dynamic ordering"""
         try:
             conn = connect(
                 region_name=self.args.aws_region,
@@ -35,11 +33,10 @@ class DataComparator:
                 work_group=self.args.athena_workgroup,
                 cursor_class=PandasCursor
             )
-            
             qualified_cols = [f'"{col}"' for col in columns]
             col_list = ', '.join(qualified_cols)
             
-            # Use provided columns for sorting
+            # Use specific order columns
             order_clause = ', '.join([f'"{col}"' for col in order_by_cols])
             
             query = f"""
@@ -48,37 +45,32 @@ class DataComparator:
                 ORDER BY {order_clause} 
                 LIMIT {sample_size}
             """
-            
-            df = conn.cursor().execute(query).as_pandas()
-            return df
+            return conn.cursor().execute(query).as_pandas()
         except Exception as e:
             logging.error(f"Athena fetch failed for {table}: {e}")
             raise
 
     def get_sqlserver_data(self, table_str: str, columns: List[str], order_by_cols: List[str], sample_size: int) -> pd.DataFrame:
-        """Fetch sample data from SQL Server with dynamic ordering"""
         try:
-            conn_str = (
-                "Driver={ODBC Driver 17 for SQL Server};"
-                f"Server={self.args.mssql_server};"
-                f"Database={self.args.mssql_db};"
-                "UID=;PWD=;"
-                "Authentication=ActiveDirectoryInteractive;"
-                # "Encrypt=yes;"
-            )
-            logging.info("Initiating SQL Server connection with MFA...")
-        # try:
-        #     mssql_username = "admin-airliquide-sas-big-prod-sql-apac-001"
-        #     mssql_password = "QAXwmFTaa35S94Y9"
-        #     conn_str = (
-        #         "Driver={ODBC Driver 17 for SQL Server};"
-        #         f"Server={self.args.mssql_server};"
-        #         f"Database={self.args.mssql_db};"
-        #         f"UID={mssql_username};"
-        #         f"PWD={mssql_password};"
-        #         "Encrypt=yes;"
-        #     )
-            
+            # V2.1: Parameterized Authentication
+            if self.args.auth_method == 'mfa':
+                conn_str = (
+                    f"Driver={{{self.args.mssql_driver}}};"
+                    f"Server={self.args.mssql_server};"
+                    f"Database={self.args.mssql_db};"
+                    f"UID={self.args.mssql_user};"
+                    "Authentication=ActiveDirectoryInteractive;"
+                )
+                logging.info("Initiating SQL Server connection with MFA...")
+            else:
+                conn_str = (
+                    f"Driver={{{self.args.mssql_driver}}};"
+                    f"Server={self.args.mssql_server};"
+                    f"Database={self.args.mssql_db};"
+                    f"UID={self.args.mssql_user};"
+                    f"PWD={self.args.mssql_password};"
+                )
+
             if '.' in table_str:
                 schema, table = table_str.split('.', 1)
             else:
@@ -89,6 +81,7 @@ class DataComparator:
                 quoted_cols = [f'[{col}]' for col in columns]
                 col_list = ', '.join(quoted_cols)
                 
+                # Use specific order columns
                 quoted_order = [f'[{col}]' for col in order_by_cols]
                 order_clause = ', '.join(quoted_order)
                 
@@ -97,19 +90,15 @@ class DataComparator:
                     FROM [{schema}].[{table}] 
                     ORDER BY {order_clause}
                 """
-                
-                df = pd.read_sql(query, conn)
-                return df
+                return pd.read_sql(query, conn)
         except Exception as e:
             logging.error(f"SQL Server fetch failed for {table_str}: {e}")
             raise
 
     def generate_excel_report(self, df_src: pd.DataFrame, df_tgt: pd.DataFrame, filename: str) -> str:
-        """Generates the Excel report"""
         try:
             if not os.path.exists(self.report_dir):
                 os.makedirs(self.report_dir)
-                
             file_path = os.path.join(self.report_dir, filename)
             writer = pd.ExcelWriter(file_path, engine='xlsxwriter')
             workbook = writer.book
@@ -132,12 +121,15 @@ class DataComparator:
             num_rows = len(df_src)
             num_cols = len(headers)
             
-            for row in range(1, num_rows + 1):
-                for col in range(num_cols):
-                    cell_ref = xlsxwriter.utility.xl_rowcol_to_cell(row, col)
-                    ws_val.write_formula(row, col, f'=Source_Data!{cell_ref}=Target_Data!{cell_ref}')
-
+            # Using conditional formatting for faster large file generation
             if num_rows > 0 and num_cols > 0:
+                # Fill formulas only if reasonable size, else relying on simple comparison in Python might be better
+                # but sticking to original logic for consistency
+                for row in range(1, num_rows + 1):
+                    for col in range(num_cols):
+                        cell_ref = xlsxwriter.utility.xl_rowcol_to_cell(row, col)
+                        ws_val.write_formula(row, col, f'=Source_Data!{cell_ref}=Target_Data!{cell_ref}')
+
                 last_col = xlsxwriter.utility.xl_col_to_name(num_cols - 1)
                 rng = f"A2:{last_col}{num_rows + 1}"
                 ws_val.conditional_format(rng, {'type': 'cell', 'criteria': '==', 'value': True, 'format': green_fmt})
@@ -149,8 +141,7 @@ class DataComparator:
             logging.error(f"Excel generation failed: {e}")
             raise
 
-    def compare_data(self, mappings: Dict, sample_size: int = 1000) -> Dict:
-        """Main comparison flow"""
+    def compare_data(self, mappings: Dict, sample_size: int) -> Dict:
         results = {
             'timestamp': datetime.now().isoformat(),
             'total_tables': len(mappings),
@@ -190,20 +181,24 @@ class DataComparator:
                 if athena_cols.empty or sql_cols.empty:
                     raise ValueError("Could not fetch schema metadata")
 
-                # Find common normalized names
+                # Map normalized names to actual column names
                 common_norm_names = sorted(list(set(athena_cols['normalized_name']) & set(sql_cols['normalized_name'])))
-                
                 ath_map = dict(zip(athena_cols['normalized_name'], athena_cols['column_name']))
                 sql_map = dict(zip(sql_cols['normalized_name'], sql_cols['column_name']))
                 
                 final_athena_cols = []
                 final_sql_cols = []
                 
-                # If PKs provided, check them
+                # FIX: Resolve Primary Keys to their actual column names on both sides
+                athena_pks = []
+                sql_pks = []
+
                 for pk in primary_keys:
                     norm_pk = self.normalize_name(pk)
                     if norm_pk not in ath_map or norm_pk not in sql_map:
                          raise ValueError(f"Primary Key {pk} not found in both tables")
+                    athena_pks.append(ath_map[norm_pk])
+                    sql_pks.append(sql_map[norm_pk])
                 
                 # Build column lists
                 for norm in common_norm_names:
@@ -212,11 +207,10 @@ class DataComparator:
                 
                 # --- 2. Determine Sort Columns ---
                 if primary_keys:
-                    # Sort by defined PKs
-                    athena_sort = primary_keys
-                    sql_sort = primary_keys
+                    # Sort by resolved PKs to avoid case sensitivity issues in ORDER BY or set_index
+                    athena_sort = athena_pks
+                    sql_sort = sql_pks
                 else:
-                    # No PK? Sort by ALL common columns
                     athena_sort = final_athena_cols
                     sql_sort = final_sql_cols
 
@@ -231,15 +225,17 @@ class DataComparator:
 
                 if not df_ath.empty and not df_sql.empty:
                     if primary_keys:
-                        # If PKs exist, align on them
-                        df_ath = df_ath.set_index(primary_keys).sort_index()
-                        df_sql = df_sql.set_index(primary_keys).sort_index()
+                        # FIX: Use resolved PKs for set_index to ensure exact column name match
+                        df_ath = df_ath.set_index(athena_pks).sort_index()
+                        df_sql = df_sql.set_index(sql_pks).sort_index()
+                        
+                        # Align Index Names (Metadata) so comparison doesn't fail on name mismatch (id vs ID)
+                        df_sql.index.names = df_ath.index.names
                     else:
-                        # No PKs: Trust the SQL 'ORDER BY' and reset index to 0..N for row-by-row comparison
                         df_ath = df_ath.reset_index(drop=True)
                         df_sql = df_sql.reset_index(drop=True)
                     
-                    # Ensure columns match for report
+                    # Ensure value columns match for report
                     df_sql.columns = df_ath.columns
                     
                     # Align rows
@@ -264,13 +260,7 @@ class DataComparator:
 
                 # --- 6. Generate Excel Report ---
                 excel_filename = f"validation_{self.normalize_name(athena_table)}_{datetime.now().strftime('%H%M%S')}.xlsx"
-                
-                self.generate_excel_report(
-                    df_ath.reset_index(), 
-                    df_sql.reset_index(), 
-                    excel_filename
-                )
-                
+                self.generate_excel_report(df_ath.reset_index(), df_sql.reset_index(), excel_filename)
                 table_result['excel_report'] = excel_filename
                     
             except Exception as e:
