@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-Null Check Module V2.1
-"""
-
 import pandas as pd
 from pyathena import connect
 from pyathena.pandas.cursor import PandasCursor
@@ -14,7 +9,6 @@ class NullChecker:
         self.args = args
 
     def get_athena_nulls(self, table: str, primary_keys: list) -> dict:
-        """Check for nulls in Athena primary key columns"""
         try:
             conn = connect(
                 region_name=self.args.aws_region,
@@ -38,9 +32,7 @@ class NullChecker:
             raise
 
     def get_sqlserver_nulls(self, table_str: str, primary_keys: list) -> dict:
-        """Check for nulls in SQL Server primary key columns"""
         try:
-            # V2.1: Dynamic Authentication
             if self.args.auth_method == 'mfa':
                 conn_str = (
                     f"Driver={{{self.args.mssql_driver}}};"
@@ -58,7 +50,6 @@ class NullChecker:
                     f"PWD={self.args.mssql_password};"
                 )
             
-            # Parse schema.table
             if '.' in table_str:
                 schema, table = table_str.split('.', 1)
             else:
@@ -80,8 +71,7 @@ class NullChecker:
             logging.error(f"Failed to check SQL Server nulls for {table_str}: {str(e)}")
             raise
 
-    def check_nulls(self, mappings: dict) -> dict:
-        """Check for nulls in primary key columns"""
+    def check_nulls(self, mappings: dict, callback=None) -> dict:
         results = {
             'total_tables': len(mappings),
             'valid_tables': 0,
@@ -90,6 +80,8 @@ class NullChecker:
         }
         
         for athena_table, config in mappings.items():
+            if callback: callback(f"Checking nulls: {athena_table}...")
+            
             sql_table = config['sql_table']
             primary_keys = config.get('primary_keys', [])
             table_result = {
@@ -137,6 +129,8 @@ class NullChecker:
                     results['valid_tables'] += 1
             
             except Exception as e:
+                msg = f"Null Check Error on {athena_table}: {str(e)}"
+                if callback: callback(f"ERROR: {msg}")
                 table_result['issues'].append(str(e))
                 table_result['has_issues'] = True
                 results['error_tables'] += 1

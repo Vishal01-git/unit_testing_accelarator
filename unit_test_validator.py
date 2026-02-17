@@ -1,4 +1,3 @@
-# unit_test_validator.py
 import logging
 from schema_compare import SchemaComparator
 from count_check import CountChecker
@@ -24,7 +23,6 @@ class Validator:
         if not all(t in valid_tests for t in self.selected_tests):
             raise ValueError(f"Invalid test specified. Choose from: {', '.join(valid_tests)}")
 
-        # V2.1: Add Authentication params to args
         self.args = type('Args', (), {
             'aws_region': config.get('aws-region'),
             's3_staging': config.get('s3-staging'),
@@ -39,35 +37,47 @@ class Validator:
             'output': output_path
         })()
 
-    def run(self):
+    def run(self, progress_callback=None):
+        """
+        Runs the validation suite.
+        progress_callback: A function that accepts a string message for real-time logging.
+        """
+        def log(msg):
+            if self.verbose: logging.info(msg)
+            if progress_callback: progress_callback(msg)
+
         try:
             results = {'total_tables': len(self.config['mappings']), 'tests': {}}
+            log(f"Starting validation for {len(self.config['mappings'])} tables...")
 
             if 'schema' in self.selected_tests:
-                if self.verbose: logging.info("Running schema comparison...")
-                results['tests']['schema'] = SchemaComparator(self.args).compare_schemas(self.config['mappings'])
+                log("--- Schema Comparison ---")
+                results['tests']['schema'] = SchemaComparator(self.args).compare_schemas(self.config['mappings'], callback=progress_callback)
 
             if 'count' in self.selected_tests:
-                if self.verbose: logging.info("Running count check...")
-                results['tests']['count'] = CountChecker(self.args).check_counts(self.config['mappings'])
+                log("--- Row Count Check ---")
+                results['tests']['count'] = CountChecker(self.args).check_counts(self.config['mappings'], callback=progress_callback)
 
             if 'duplicates' in self.selected_tests:
-                if self.verbose: logging.info("Running duplicate check...")
-                results['tests']['duplicates'] = DuplicateChecker(self.args).check_duplicates(self.config['mappings'])
+                log("--- Duplicate Check ---")
+                results['tests']['duplicates'] = DuplicateChecker(self.args).check_duplicates(self.config['mappings'], callback=progress_callback)
 
             if 'nulls' in self.selected_tests:
-                if self.verbose: logging.info("Running null check...")
-                results['tests']['nulls'] = NullChecker(self.args).check_nulls(self.config['mappings'])
+                log("--- Null Check ---")
+                results['tests']['nulls'] = NullChecker(self.args).check_nulls(self.config['mappings'], callback=progress_callback)
 
             if 'data' in self.selected_tests:
-                if self.verbose: logging.info(f"Running data comparison with sample size {self.sample_size}...")
-                results['tests']['data'] = DataComparator(self.args).compare_data(self.config['mappings'], self.sample_size)
+                log(f"--- Data Comparison (Sample: {self.sample_size}) ---")
+                results['tests']['data'] = DataComparator(self.args).compare_data(self.config['mappings'], self.sample_size, callback=progress_callback)
 
-            if self.verbose: logging.info("Generating HTML report...")
+            log("Generating HTML Report...")
             ReportGenerator().generate(results, self.output_path)
+            log(f"Report generated successfully.")
             
-            return True, f"Validation complete! Report saved to {self.output_path}"
+            return True, f"Validation complete!"
             
         except Exception as e:
-            logging.error(f"Fatal error during validation: {str(e)}", exc_info=True)
+            error_msg = f"Fatal error during validation: {str(e)}"
+            logging.error(error_msg, exc_info=True)
+            log(error_msg)
             return False, str(e)

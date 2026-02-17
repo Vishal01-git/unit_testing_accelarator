@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-Duplicate Check Module V2.1
-"""
-
 import pandas as pd
 from pyathena import connect
 from pyathena.pandas.cursor import PandasCursor
@@ -14,7 +9,6 @@ class DuplicateChecker:
         self.args = args
 
     def get_athena_duplicates(self, table: str, primary_keys: list) -> list:
-        """Check for duplicates in Athena table"""
         try:
             conn = connect(
                 region_name=self.args.aws_region,
@@ -24,7 +18,6 @@ class DuplicateChecker:
                 cursor_class=PandasCursor
             )
             key_list = ', '.join(primary_keys)
-            # Limit to 100 to avoid memory overflow in UI
             query = f"""
                 SELECT {key_list}, COUNT(*) as cnt
                 FROM {self.args.athena_db}.{table}
@@ -39,9 +32,7 @@ class DuplicateChecker:
             raise
 
     def get_sqlserver_duplicates(self, table_str: str, primary_keys: list) -> list:
-        """Check for duplicates in SQL Server table"""
         try:
-            # V2.1: Dynamic Authentication
             if self.args.auth_method == 'mfa':
                 conn_str = (
                     f"Driver={{{self.args.mssql_driver}}};"
@@ -59,7 +50,6 @@ class DuplicateChecker:
                     f"PWD={self.args.mssql_password};"
                 )
             
-            # Parse schema.table
             if '.' in table_str:
                 schema, table = table_str.split('.', 1)
             else:
@@ -80,8 +70,7 @@ class DuplicateChecker:
             logging.error(f"Failed to check SQL Server duplicates for {table_str}: {str(e)}")
             raise
 
-    def check_duplicates(self, mappings: dict) -> dict:
-        """Check for duplicates based on primary keys"""
+    def check_duplicates(self, mappings: dict, callback=None) -> dict:
         results = {
             'total_tables': len(mappings),
             'valid_tables': 0,
@@ -90,6 +79,8 @@ class DuplicateChecker:
         }
         
         for athena_table, config in mappings.items():
+            if callback: callback(f"Checking duplicates: {athena_table}...")
+            
             sql_table = config['sql_table']
             primary_keys = config.get('primary_keys', [])
             table_result = {
@@ -103,7 +94,7 @@ class DuplicateChecker:
             
             if not primary_keys:
                 table_result['issues'].append("Skipped: No primary keys specified")
-                table_result['has_issues'] = True # Mark as issue so user notices
+                table_result['has_issues'] = True
                 results['tables'].append(table_result)
                 results['error_tables'] += 1
                 continue
@@ -134,6 +125,8 @@ class DuplicateChecker:
                     results['valid_tables'] += 1
             
             except Exception as e:
+                msg = f"Duplicate Check Error on {athena_table}: {str(e)}"
+                if callback: callback(f"ERROR: {msg}")
                 table_result['issues'].append(str(e))
                 table_result['has_issues'] = True
                 results['error_tables'] += 1

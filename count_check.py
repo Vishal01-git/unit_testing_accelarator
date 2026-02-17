@@ -26,7 +26,6 @@ class CountChecker:
 
     def get_sqlserver_count(self, table_str: str) -> int:
         try:
-            # V2.1: Dynamic Auth
             if self.args.auth_method == 'mfa':
                 conn_str = (
                     f"Driver={{{self.args.mssql_driver}}};"
@@ -56,10 +55,12 @@ class CountChecker:
             logging.error(f"Failed to fetch SQL Server count for {table_str}: {str(e)}")
             raise
 
-    def check_counts(self, mappings: dict) -> dict:
+    def check_counts(self, mappings: dict, callback=None) -> dict:
         results = {'total_tables': len(mappings), 'valid_tables': 0, 'error_tables': 0, 'tables': []}
         
         for athena_table, config in mappings.items():
+            if callback: callback(f"Counting rows: {athena_table}...")
+            
             sql_table = config['sql_table']
             table_result = {'id': athena_table.lower().replace(' ', '_'), 'athena_name': athena_table, 'sql_name': sql_table, 'has_issues': False, 'issues': [], 'counts': {}}
             
@@ -80,6 +81,8 @@ class CountChecker:
                 else:
                     results['valid_tables'] += 1
             except Exception as e:
+                msg = f"Count Check Error on {athena_table}: {str(e)}"
+                if callback: callback(f"ERROR: {msg}")
                 table_result['issues'].append(str(e))
                 table_result['has_issues'] = True
                 results['error_tables'] += 1

@@ -3,192 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unit Test Validator V2.1</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Unit Test Validator</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #367BF5;
-            --primary-hover: #2a62c4;
-            --background-color: #f0f2f5;
-            --card-background: #ffffff;
-            --text-color: #1d2129;
-            --text-secondary: #606770;
-            --border-color: #dddfe2;
-            --input-background: #f5f6f7;
-            --console-background: #1e1e1e;
-            --console-text: #d4d4d4;
-            --success-color: #28a745;
-            --error-color: #dc3545;
-        }
-
+        :root { --primary-color: #367BF5; --primary-hover: #2a62c4; --bg-color: #f0f2f5; --card-bg: #ffffff; --text-color: #1d2129; --border-color: #dddfe2; --input-bg: #f5f6f7; --console-bg: #1e1e1e; --console-text: #00ff00; --sidebar-width: 260px; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); line-height: 1.6; }
-        .container { max-width: 900px; margin: 3rem auto; }
-        .header { text-align: center; margin-bottom: 2rem; }
-        .header h1 { font-size: 2.5rem; font-weight: 700; }
-        .card { background-color: var(--card-background); border-radius: 8px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .section-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); height: 100vh; overflow: hidden; display: flex; }
+        .sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; height: 100%; }
+        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); font-weight: 700; font-size: 1.2rem; color: var(--primary-color); }
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 1rem; }
+        .history-item { padding: 10px; border-radius: 6px; margin-bottom: 8px; cursor: pointer; transition: background 0.2s; border: 1px solid transparent; }
+        .history-item:hover { background: #f0f4ff; border-color: #d0e1fd; }
+        .history-item .date { font-size: 0.75rem; color: #888; }
+        .history-item .name { font-size: 0.9rem; font-weight: 500; word-break: break-all; }
+        .empty-history { text-align: center; color: #999; font-size: 0.9rem; margin-top: 2rem; }
+        .main-content { flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .action-bar { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 10px; }
+        .btn-small { padding: 8px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+        .card { background-color: var(--card-bg); border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
         .form-group { display: flex; flex-direction: column; }
-        label { font-weight: 500; margin-bottom: .5rem; font-size: 0.9em; color: var(--text-secondary); }
-        input[type="text"], input[type="number"], input[type="password"], select, textarea { padding: 12px; border: 1px solid var(--border-color); background-color: var(--input-background); border-radius: 6px; font-family: inherit; font-size: 1em; }
-        textarea { height: 120px; resize: vertical; }
-        .btn { background-color: var(--primary-color); color: white; padding: 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1em; font-weight: 600; width: 100%; }
+        label { font-weight: 500; margin-bottom: .4rem; font-size: 0.85rem; color: #606770; }
+        input, select, textarea { padding: 10px; border: 1px solid var(--border-color); background-color: var(--input-background); border-radius: 4px; font-family: inherit; font-size: 0.95em; }
+        textarea { height: 80px; resize: vertical; }
+        .btn { background-color: var(--primary-color); color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
         .btn:hover { background-color: var(--primary-hover); }
-        #output-container { display: none; }
-        #output { margin-top: 1.5rem; background: var(--console-background); color: var(--console-text); padding: 1.5rem; border-radius: 8px; white-space: pre-wrap; font-family: monospace; max-height: 400px; overflow-y: auto; }
-        #spinner { display: none; margin: 20px auto; width: 40px; height: 40px; border: 4px solid rgba(0,0,0,0.1); border-top: 4px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; }
-        #report-link-container { margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; }
-        .report-btn { padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; }
-        .report-btn.view { background-color: var(--success-color); color: white; }
-        .error-message { color: var(--error-color); }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .btn-outline { background: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); }
+        .btn-outline:hover { background: #eef4ff; }
+        #console-container { display: none; margin-top: 20px; }
+        .console-window { background-color: var(--console-bg); color: var(--console-text); padding: 1rem; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.9rem; height: 300px; overflow-y: auto; white-space: pre-wrap; border: 1px solid #333; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        .console-line { margin-bottom: 4px; border-bottom: 1px solid #333; padding-bottom: 2px; }
+        .console-line.error { color: #ff4444; }
+        .console-line.success { color: #00ff00; font-weight: bold; }
+        #report-link-container { margin-top: 1rem; text-align: center; }
+        .report-btn { display: inline-block; background: #28a745; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; }
+        .hidden { display: none; }
+        .mode-switch { display: flex; gap: 15px; margin-bottom: 15px; background: #f8f9fa; padding: 8px; border-radius: 4px; }
+        .radio-label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .mapping-container { max-height: 300px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 4px; margin-top: 10px; }
+        .mapping-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .mapping-table th { background: #f1f1f1; position: sticky; top: 0; padding: 8px; text-align: left; border-bottom: 1px solid #ddd; z-index: 2; }
+        .mapping-table td { padding: 6px 8px; border-bottom: 1px solid #eee; background: white; }
+        .mapping-table input { width: 100%; border: none; background: transparent; padding: 4px; }
+        .mapping-table input:focus { background: #fff; outline: 1px solid var(--primary-color); }
+        .fetch-status { margin-left: 10px; font-size: 0.85em; display: none; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Unit Testing Validator V2.1</h1>
-            <p>A unified interface to configure and run your data validation suite.</p>
-        </div>
-
-        <div class="card">
-            <h2 class="section-title">Dynamic Configuration</h2>
-            <div class="form-grid">
-                <div class="form-group"><label for="env">Environment</label><input type="text" id="env" placeholder="dev,pprd,prod" onkeyup="updatePaths()"></div>
-                <div class="form-group"><label for="initiative">Initiative ID</label><input type="text" id="initiative" placeholder="e.g 6051" onkeyup="updatePaths()"></div>
-                <div class="form-group"><label for="name">Name</label><input type="text" id="name" placeholder="e.g c2p,pgl" onkeyup="updatePaths()"></div>
-                <div class="form-group"><label for="layer">Layer</label><input type="text" id="layer" placeholder="athena layer e.g stg,int,mart" onkeyup="updatePaths()"></div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h2 class="section-title">SQL Server Authentication</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="auth-method">Authentication Method</label>
-                    <select id="auth-method" onchange="togglePassword()">
-                        <option value="mfa">MFA (Active Directory Interactive)</option>
-                        <option value="password">SQL Login (Username/Password)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="mssql-username">Username / Email</label>
-                    <input type="text" id="mssql-username" placeholder="user@domain.com or username">
-                </div>
-                <div class="form-group" id="mssql-password-group" style="display:none;">
-                    <label for="mssql-password">Password</label>
-                    <input type="password" id="mssql-password" placeholder="Enter password">
-                </div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h2 class="section-title">Execution Parameters</h2>
-            <div class="form-grid">
-                <div class="form-group"><label for="aws-region">AWS Region</label><input type="text" id="aws-region" value="ap-southeast-1"></div>
-                <div class="form-group"><label for="sample-size">Sample Size</label><input type="number" id="sample-size" value="100" min="1"></div>
-                <div class="form-group" style="grid-column: 1 / -1;"><label for="tests">Tests to Run</label><input type="text" id="tests" value="schema,count,duplicates,nulls,data"></div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 class="section-title">Table Mappings</h2>
-            <div class="form-grid">
-                <div class="form-group" style="grid-column: 1 / -1;">
-                    <label for="athena-tables">Athena Tables (comma-separated)</label>
-                    <textarea id="athena-tables" placeholder="athena_table1, athena_table2"></textarea>
-                </div>
-                <div class="form-group" style="grid-column: 1 / -1;">
-                    <label for="sql-tables">SQL Server Tables (schema.table format)</label>
-                    <textarea id="sql-tables" placeholder="dbo.sql_table1, sales.sql_table2"></textarea>
-                </div>
-                 <div class="form-group" style="grid-column: 1 / -1;">
-                    <label for="primary-keys">Primary Keys (optional, comma-separated for tables, semicolon-separated for multiple keys)</label>
-                    <textarea id="primary-keys" placeholder="id1;id2, id3"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 class="section-title">Generated Paths (Editable)</h2>
-            <div class="form-grid">
-                <div class="form-group"><label>S3 Staging</label><input type="text" id="s3-staging-path" class="generated-path"></div>
-                <div class="form-group"><label>Athena DB</label><input type="text" id="athena-db-path" class="generated-path"></div>
-                <div class="form-group"><label>Athena Workgroup</label><input type="text" id="athena-workgroup-path" class="generated-path"></div>
-                <div class="form-group"><label>SQL Server</label><input type="text" id="mssql-server-path" class="generated-path"></div>
-                <div class="form-group"><label>SQL DB</label><input type="text" id="mssql-db-path" class="generated-path"></div>
-            </div>
-        </div>
-        
-        <button id="run-btn" class="btn">Run Validation</button>
-        
-        <div id="output-container">
-             <div id="spinner"></div>
-             <div id="output"></div>
-             <div id="report-link-container"></div>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header"><i class="fas fa-history"></i> Run History</div>
+        <div class="sidebar-content" id="history-list"><div class="empty-history">Loading history...</div></div>
+        <div style="padding: 1rem; border-top: 1px solid #eee; text-align: center;">
+            <button class="btn btn-outline btn-small" style="width:100%; justify-content:center;" onclick="loadHistory()"><i class="fas fa-sync"></i> Refresh List</button>
         </div>
     </div>
 
+    <!-- Main -->
+    <div class="main-content">
+        <div class="action-bar">
+            <input type="file" id="config-upload" accept=".json" style="display: none;" onchange="loadConfigurationFromFile(this)">
+            <button class="btn btn-outline btn-small" onclick="document.getElementById('config-upload').click()"><i class="fas fa-upload"></i> Load Config</button>
+            <button class="btn btn-outline btn-small" onclick="saveConfiguration()"><i class="fas fa-save"></i> Save Config</button>
+        </div>
+
+        <div class="header" style="text-align: left; margin-bottom: 1rem;">
+            <h1 style="font-size: 2rem;">Unit Testing Validator</h1>
+            <p style="color: #666;">One stop solution for all you testing need</p>
+        </div>
+
+        <form id="main-form" onsubmit="return false;">
+            <div class="card">
+                <h2 class="section-title">1. Connection Details</h2>
+                <div class="form-grid">
+                    <div class="form-group"><label>Environment</label><input type="text" id="env" placeholder="dev, pprd" onkeyup="updatePaths()"></div>
+                    <div class="form-group"><label>Initiative ID</label><input type="text" id="initiative" placeholder="6051" onkeyup="updatePaths()"></div>
+                    <div class="form-group"><label>Name</label><input type="text" id="name" placeholder="pgl" onkeyup="updatePaths()"></div>
+                    <div class="form-group"><label>Layer</label><input type="text" id="layer" placeholder="int" onkeyup="updatePaths()"></div>
+                </div>
+                <div class="form-grid" style="margin-top: 1rem;">
+                    <div class="form-group">
+                        <label>Auth Method</label>
+                        <select id="auth-method" onchange="togglePassword()">
+                            <option value="mfa">MFA (Active Directory)</option>
+                            <option value="password">SQL Login (Password)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>SQL User</label><input type="text" id="mssql-username" placeholder="user@domain.com"></div>
+                    <div class="form-group" id="pwd-group" style="display:none"><label>SQL Password</label><input type="password" id="mssql-password"></div>
+                </div>
+            </div>
+
+            <!-- Path Config -->
+            <details class="card" style="padding: 1rem;">
+                <summary style="cursor: pointer; font-weight: 600;">Advanced: Connection Paths</summary>
+                <div class="form-grid" style="margin-top: 1rem;">
+                    <div class="form-group"><label>S3 Staging</label><input type="text" id="s3-staging-path"></div>
+                    <div class="form-group"><label>Athena DB</label><input type="text" id="athena-db-path"></div>
+                    <div class="form-group"><label>Workgroup</label><input type="text" id="athena-workgroup-path"></div>
+                    <div class="form-group"><label>SQL Server</label><input type="text" id="mssql-server-path"></div>
+                    <div class="form-group"><label>SQL DB</label><input type="text" id="mssql-db-path"></div>
+                </div>
+            </details>
+
+            <div class="card">
+                <h2 class="section-title">2. Table Mappings</h2>
+                <div class="mode-switch">
+                    <label class="radio-label"><input type="radio" name="map-mode" value="manual" checked onchange="toggleMode()"> Manual Entry</label>
+                    <label class="radio-label"><input type="radio" name="map-mode" value="metadata" onchange="toggleMode()"> Metadata Search</label>
+                </div>
+
+                <div id="manual-mode-ui">
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column: 1 / -1;"><label>Athena Tables</label><textarea id="athena-tables" placeholder="table1, table2"></textarea></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label>SQL Tables</label><textarea id="sql-tables" placeholder="dbo.table1, dbo.table2"></textarea></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label>Primary Keys</label><textarea id="primary-keys" placeholder="id1;id2, id3"></textarea></div>
+                    </div>
+                </div>
+
+                <div id="metadata-mode-ui" class="hidden">
+                    <div style="display:flex; align-items:center; margin-bottom:1rem;">
+                        <button class="btn btn-outline" id="fetch-tables-btn" onclick="fetchMetadata()"><i class="fas fa-sync"></i> Fetch Tables</button>
+                        <span id="fetch-status" class="fetch-status"></span>
+                    </div>
+                    <datalist id="athena-list"></datalist>
+                    <datalist id="sql-list"></datalist>
+                    <div class="mapping-container">
+                        <table class="mapping-table">
+                            <thead><tr><th style="width:30px;"></th><th>Athena Table</th><th>SQL Table</th><th>Primary Keys</th><th style="width:30px;"></th></tr></thead>
+                            <tbody id="mapping-body"></tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-outline btn-small" style="margin-top:5px;" onclick="addGridRow()">+ Add Row</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="section-title">3. Execution</h2>
+                <div class="form-grid">
+                    <div class="form-group"><label>AWS Region</label><input type="text" id="aws-region" value="ap-southeast-1"></div>
+                    <div class="form-group"><label>Sample Size</label><input type="number" id="sample-size" value="100"></div>
+                    <div class="form-group" style="grid-column: 1 / -1;"><label>Tests</label><input type="text" id="tests" value="schema,count,duplicates,nulls,data"></div>
+                </div>
+                <button id="run-btn" class="btn" style="width:100%; margin-top:1.5rem; font-size:1.1rem;">Run Validation</button>
+                
+                <div id="console-container">
+                    <div class="sidebar-header" style="border:none; padding: 0 0 10px 0; font-size: 1rem;"><i class="fas fa-terminal"></i> Execution Log</div>
+                    <div id="console-output" class="console-window"></div>
+                    <div id="report-link-container"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <script>
+        async function loadHistory() {
+            const list = document.getElementById('history-list');
+            try {
+                const res = await fetch('/history');
+                const data = await res.json();
+                list.innerHTML = '';
+                if(data.length === 0) list.innerHTML = '<div class="empty-history">No runs found.</div>';
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'history-item';
+                    div.innerHTML = `<div class="name">Report ${item.filename.replace('report_', '').substring(0,8)}...</div><div class="date">${item.created_at}</div>`;
+                    div.onclick = () => window.open(`/reports/${item.filename}`, '_blank');
+                    list.appendChild(div);
+                });
+            } catch(e) { list.innerHTML = '<div class="empty-history">Error loading history.</div>'; }
+        }
+
+        // --- SAVE CONFIGURATION ---
+        function saveConfiguration() {
+            // Get Metadata Grid Data
+            const gridData = [];
+            document.querySelectorAll('#mapping-body tr').forEach(row => {
+                gridData.push({
+                    ath: row.querySelector('.row-ath').value,
+                    sql: row.querySelector('.row-sql').value,
+                    pk: row.querySelector('.row-pk').value
+                });
+            });
+
+            const data = {
+                env: document.getElementById('env').value,
+                initiative: document.getElementById('initiative').value,
+                name: document.getElementById('name').value,
+                layer: document.getElementById('layer').value,
+                authMethod: document.getElementById('auth-method').value,
+                mssqlUser: document.getElementById('mssql-username').value,
+                // Paths (capture explicit values)
+                s3: document.getElementById('s3-staging-path').value,
+                athDb: document.getElementById('athena-db-path').value,
+                wg: document.getElementById('athena-workgroup-path').value,
+                sqlSrv: document.getElementById('mssql-server-path').value,
+                sqlDb: document.getElementById('mssql-db-path').value,
+                
+                mapMode: document.querySelector('input[name="map-mode"]:checked').value,
+                manual: {
+                    ath: document.getElementById('athena-tables').value,
+                    sql: document.getElementById('sql-tables').value,
+                    pk: document.getElementById('primary-keys').value
+                },
+                grid: gridData,
+                exec: {
+                    region: document.getElementById('aws-region').value,
+                    sample: document.getElementById('sample-size').value,
+                    tests: document.getElementById('tests').value
+                }
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `config_${data.name || 'validation'}.json`;
+            a.click();
+        }
+
+        // --- LOAD CONFIGURATION ---
+        function loadConfigurationFromFile(input) {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    // 1. Basic Fields
+                    document.getElementById('env').value = data.env || '';
+                    document.getElementById('initiative').value = data.initiative || '';
+                    document.getElementById('name').value = data.name || '';
+                    document.getElementById('layer').value = data.layer || '';
+                    document.getElementById('auth-method').value = data.authMethod || 'mfa';
+                    document.getElementById('mssql-username').value = data.mssqlUser || '';
+                    togglePassword();
+
+                    // 2. Paths (Overwrite standard generation)
+                    if(data.s3) document.getElementById('s3-staging-path').value = data.s3;
+                    if(data.athDb) document.getElementById('athena-db-path').value = data.athDb;
+                    if(data.wg) document.getElementById('athena-workgroup-path').value = data.wg;
+                    if(data.sqlSrv) document.getElementById('mssql-server-path').value = data.sqlSrv;
+                    if(data.sqlDb) document.getElementById('mssql-db-path').value = data.sqlDb;
+
+                    // 3. Mapping Mode
+                    const mode = data.mapMode || 'manual';
+                    document.querySelector(`input[name="map-mode"][value="${mode}"]`).checked = true;
+                    toggleMode();
+
+                    // 4. Manual Mappings
+                    if(data.manual) {
+                        document.getElementById('athena-tables').value = data.manual.ath || '';
+                        document.getElementById('sql-tables').value = data.manual.sql || '';
+                        document.getElementById('primary-keys').value = data.manual.pk || '';
+                    }
+
+                    // 5. Grid Mappings
+                    if(data.grid && Array.isArray(data.grid)) {
+                        const tbody = document.getElementById('mapping-body');
+                        tbody.innerHTML = ''; // Clear existing
+                        data.grid.forEach(row => addGridRow(row.ath, row.sql, row.pk));
+                    }
+
+                    // 6. Exec Params
+                    if(data.exec) {
+                        document.getElementById('aws-region').value = data.exec.region || 'ap-southeast-1';
+                        document.getElementById('sample-size').value = data.exec.sample || 100;
+                        document.getElementById('tests').value = data.exec.tests || '';
+                    }
+                    alert("Configuration loaded successfully!");
+                } catch(err) {
+                    alert("Error parsing config file: " + err);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- Helpers ---
         function togglePassword() {
-            const authMethod = document.getElementById('auth-method').value;
-            const passwordGroup = document.getElementById('mssql-password-group');
-            passwordGroup.style.display = (authMethod === 'password') ? 'flex' : 'none';
+            const m = document.getElementById('auth-method').value;
+            document.getElementById('pwd-group').style.display = m === 'password' ? 'flex' : 'none';
         }
 
         function updatePaths() {
             const env = document.getElementById('env').value.toLowerCase();
-            let sqlEnv = env;
-            if (env === 'pprd') sqlEnv = 'uat';
-            
-            const initiative = document.getElementById('initiative').value;
+            let sqlEnv = env === 'pprd' ? 'uat' : env;
+            const init = document.getElementById('initiative').value;
             const name = document.getElementById('name').value;
             const layer = document.getElementById('layer').value;
             
-            document.getElementById('s3-staging-path').value = `s3://al-gdo-${env}-ap-dl-${initiative}-formatted-p/`;
-            document.getElementById('athena-db-path').value = `${env}_bi_ap_${initiative}_${layer}_${name}`;
-            document.getElementById('athena-workgroup-path').value = `${initiative}-workgroup`;
+            document.getElementById('s3-staging-path').value = `s3://al-gdo-${env}-ap-dl-${init}-formatted-p/`;
+            document.getElementById('athena-db-path').value = `${env}_bi_ap_${init}_${layer}_${name}`;
+            document.getElementById('athena-workgroup-path').value = `${init}-workgroup`;
             document.getElementById('mssql-server-path').value = `al-sas-big-${sqlEnv}-sql-${name}-01.database.windows.net`;
             document.getElementById('mssql-db-path').value = `al-sas-big-${sqlEnv}-sql-${name}-01-db-01`;
         }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            updatePaths();
-            togglePassword();
-        });
 
-        document.getElementById('run-btn').addEventListener('click', async () => {
-            const outputContainer = document.getElementById('output-container');
-            const outputDiv = document.getElementById('output');
-            const spinner = document.getElementById('spinner');
-            const reportLinkContainer = document.getElementById('report-link-container');
+        function toggleMode() {
+            const mode = document.querySelector('input[name="map-mode"]:checked').value;
+            const man = document.getElementById('manual-mode-ui');
+            const meta = document.getElementById('metadata-mode-ui');
+            if (mode === 'manual') { man.classList.remove('hidden'); meta.classList.add('hidden'); }
+            else { man.classList.add('hidden'); meta.classList.remove('hidden'); if(document.getElementById('mapping-body').children.length === 0) addGridRow(); }
+        }
+
+        async function fetchMetadata() {
+            const btn = document.getElementById('fetch-tables-btn');
+            const status = document.getElementById('fetch-status');
+            btn.disabled = true; status.style.display = 'inline-block'; status.className = 'fetch-status loading'; status.innerText = 'Connecting...';
             
-            outputContainer.style.display = 'block';
-            outputDiv.innerHTML = '';
-            reportLinkContainer.innerHTML = '';
-            spinner.style.display = 'block';
-
-            const mappings = {};
-            const athenaTables = document.getElementById('athena-tables').value.split(',').map(t => t.trim()).filter(Boolean);
-            const sqlTables = document.getElementById('sql-tables').value.split(',').map(t => t.trim()).filter(Boolean);
-            const primaryKeysList = document.getElementById('primary-keys').value.split(',').map(k => k.trim());
-            
-            if (athenaTables.length !== sqlTables.length) {
-                outputDiv.innerHTML = `<span class="error-message">Error: The number of Athena tables must match the number of SQL Server tables.</span>`;
-                spinner.style.display = 'none';
-                return;
-            }
-
-            for (let i = 0; i < athenaTables.length; i++) {
-                const athenaTable = athenaTables[i];
-                const sqlTable = sqlTables[i];
-                const primaryKeys = (primaryKeysList[i] || '').split(';').map(k => k.trim()).filter(Boolean);
-                mappings[athenaTable] = { "sql_table": sqlTable, "primary_keys": primaryKeys };
-            }
-
             const payload = {
                 "aws-region": document.getElementById('aws-region').value,
                 "s3-staging": document.getElementById('s3-staging-path').value,
@@ -197,9 +324,78 @@
                 "mssql-server": document.getElementById('mssql-server-path').value,
                 "mssql-db": document.getElementById('mssql-db-path').value,
                 "auth-method": document.getElementById('auth-method').value,
-                "mssql-user": document.getElementById('mssql-username').value,
+                "mssql-username": document.getElementById('mssql-username').value,
+                "mssql-password": document.getElementById('mssql-password').value
+            };
+
+            try {
+                const res = await fetch('/fetch_tables', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+                const data = await res.json();
+                if(data.status === 'success') {
+                    const athList = document.getElementById('athena-list');
+                    const sqlList = document.getElementById('sql-list');
+                    athList.innerHTML = ''; sqlList.innerHTML = '';
+                    data.athena_tables.forEach(t => athList.appendChild(new Option(t, t)));
+                    data.sql_tables.forEach(t => sqlList.appendChild(new Option(t, t)));
+                    status.className = 'fetch-status success'; status.innerText = `Found ${data.athena_tables.length} Athena / ${data.sql_tables.length} SQL tables`;
+                } else { throw new Error(data.message); }
+            } catch(e) {
+                status.style.color = 'red'; status.innerText = 'Error: ' + e.message; alert(e.message);
+            } finally { btn.disabled = false; }
+        }
+
+        function addGridRow(ath='', sql='', pk='') {
+            const tbody = document.getElementById('mapping-body');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="text-align:center; color:#ccc;">::</td>
+                <td><input type="text" list="athena-list" placeholder="Table Name..." class="row-ath" value="${ath}"></td>
+                <td><input type="text" list="sql-list" placeholder="Schema.Table..." class="row-sql" value="${sql}"></td>
+                <td><input type="text" placeholder="pk1, pk2" class="row-pk" value="${pk}"></td>
+                <td style="text-align:center; cursor:pointer; color:red;" onclick="this.parentElement.remove()">×</td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        // --- RUN VALIDATION ---
+        document.getElementById('run-btn').addEventListener('click', async () => {
+            const mappings = {};
+            const mode = document.querySelector('input[name="map-mode"]:checked').value;
+            if (mode === 'manual') {
+                const ath = document.getElementById('athena-tables').value.split(',').map(t=>t.trim()).filter(Boolean);
+                const sql = document.getElementById('sql-tables').value.split(',').map(t=>t.trim()).filter(Boolean);
+                const pk = document.getElementById('primary-keys').value.split(';').map(t=>t.trim());
+                if(ath.length !== sql.length) return alert("Athena and SQL table counts mismatch!");
+                ath.forEach((t, i) => mappings[t] = {sql_table: sql[i], primary_keys: (pk[i]||'').split(',').map(k=>k.trim()).filter(Boolean)});
+            } else {
+                document.querySelectorAll('#mapping-body tr').forEach(r => {
+                    const ath = r.querySelector('.row-ath').value.trim();
+                    const sql = r.querySelector('.row-sql').value.trim();
+                    const pk = r.querySelector('.row-pk').value.trim();
+                    if(ath && sql) mappings[ath] = {sql_table: sql, primary_keys: pk.split(',').map(k=>k.trim()).filter(Boolean)};
+                });
+            }
+
+            if(Object.keys(mappings).length === 0) return alert("No tables mapped!");
+
+            const consoleDiv = document.getElementById('console-output');
+            const container = document.getElementById('console-container');
+            const linkDiv = document.getElementById('report-link-container');
+            container.style.display = 'block';
+            consoleDiv.innerHTML = '<div class="console-line">Validation Started Please wait...</div>';
+            linkDiv.innerHTML = '';
+            
+            const payload = {
+                "aws-region": document.getElementById('aws-region').value,
+                "s3-staging": document.getElementById('s3-staging-path').value,
+                "athena-db": document.getElementById('athena-db-path').value,
+                "athena-workgroup": document.getElementById('athena-workgroup-path').value,
+                "mssql-server": document.getElementById('mssql-server-path').value,
+                "mssql-db": document.getElementById('mssql-db-path').value,
+                "auth-method": document.getElementById('auth-method').value,
+                "mssql-username": document.getElementById('mssql-username').value,
                 "mssql-password": document.getElementById('mssql-password').value,
-                "sample-size": parseInt(document.getElementById('sample-size').value) || 100,
+                "sample-size": document.getElementById('sample-size').value,
                 "tests": document.getElementById('tests').value,
                 "mappings": mappings
             };
@@ -210,21 +406,61 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                const result = await response.json();
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
                 
-                if (result.status === 'success') {
-                    outputDiv.innerHTML = result.output;
-                    if(result.report_url) {
-                        reportLinkContainer.innerHTML = `<a href="${result.report_url}" target="_blank" class="report-btn view">View Report</a>`;
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n').filter(Boolean);
+                    
+                    for (const line of lines) {
+                        try {
+                            const data = JSON.parse(line);
+                            if (data.type === 'log') {
+                                const lineDiv = document.createElement('div');
+                                lineDiv.className = 'console-line';
+                                if(data.message.startsWith('ERROR')) lineDiv.className += ' error';
+                                lineDiv.innerText = `> ${data.message}`;
+                                consoleDiv.appendChild(lineDiv);
+                                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+                            } else if (data.type === 'result') {
+                                if (data.status === 'success') {
+                                    const successDiv = document.createElement('div');
+                                    successDiv.className = 'console-line success';
+                                    successDiv.innerText = `SUCCESS: ${data.output}`;
+                                    consoleDiv.appendChild(successDiv);
+                                    linkDiv.innerHTML = `<a href="${data.report_url}" target="_blank" class="report-btn">View HTML Report</a>`;
+                                    loadHistory();
+                                } else {
+                                    const errDiv = document.createElement('div');
+                                    errDiv.className = 'console-line error';
+                                    errDiv.innerText = `FAILURE: ${data.output}`;
+                                    consoleDiv.appendChild(errDiv);
+                                }
+                            } else if (data.type === 'error') {
+                                const errDiv = document.createElement('div');
+                                errDiv.className = 'console-line error';
+                                errDiv.innerText = `CRITICAL ERROR: ${data.message}`;
+                                consoleDiv.appendChild(errDiv);
+                            }
+                        } catch (e) {
+                            console.error("Parse error", e);
+                        }
                     }
-                } else {
-                     outputDiv.innerHTML = `<span class="error-message">${result.output}</span>`;
                 }
-            } catch (error) {
-                outputDiv.innerHTML = `<span class="error-message">An unexpected error occurred: ${error}</span>`;
-            } finally {
-                spinner.style.display = 'none';
+            } catch (err) {
+                consoleDiv.innerHTML += `<div class="console-line error">Network Error: ${err}</div>`;
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePaths();
+            togglePassword();
+            loadHistory();
         });
     </script>
 </body>

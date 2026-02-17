@@ -4,3 +4,4 @@ pyathena
 pyodbc
 dominate
 xlsxwriter
+openpyxl

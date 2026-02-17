@@ -1,4 +1,3 @@
-# schema_compare.py
 import pandas as pd
 from pyathena import connect
 from pyathena.pandas.cursor import PandasCursor
@@ -57,7 +56,6 @@ class SchemaComparator:
 
     def get_sqlserver_columns(self, target_tables: list) -> pd.DataFrame:
         try:
-            # V2.1: Dynamic Auth
             if self.args.auth_method == 'mfa':
                 conn_str = (
                     f"Driver={{{self.args.mssql_driver}}};"
@@ -116,15 +114,20 @@ class SchemaComparator:
             logging.error(f"SQL Server connection failed: {str(e)}")
             raise
 
-    def compare_schemas(self, mappings: dict) -> dict:
-        # ... (rest of the file remains similar to original, only formatting/imports might change)
-        # Using the original logic for comparison
+    def compare_schemas(self, mappings: dict, callback=None) -> dict:
         sql_target_list = [config['sql_table'] for config in mappings.values()]
+        
+        if callback: callback("Fetching Athena Schema Metadata...")
         athena_df = self.get_athena_columns()
+        
+        if callback: callback("Fetching SQL Server Schema Metadata...")
         sql_df = self.get_sqlserver_columns(sql_target_list)
+        
         results = {'total_tables': len(mappings), 'valid_tables': 0, 'error_tables': 0, 'tables': []}
         
         for athena_table, config in mappings.items():
+            if callback: callback(f"Schema Check: {athena_table}...")
+            
             sql_table_full = config['sql_table']
             table_result = {'id': self.normalize_name(athena_table), 'athena_name': athena_table, 'sql_name': sql_table_full, 'has_issues': False, 'issues': [], 'columns': []}
             norm_athena_table = self.normalize_name(athena_table)
