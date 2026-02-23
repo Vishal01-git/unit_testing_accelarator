@@ -1,0 +1,11 @@
+[theme]
+base = "light"
+backgroundColor = "#F0F2F6"
+secondaryBackgroundColor = "#E0E4EB"
+textColor = "#1E1E1E"
+primaryColor = "#367BF5"
+
+[server]
+# This explicitly tells Streamlit to serve files placed in a 'static' folder 
+# so we can open HTML reports in a new browser tab.
+enableStaticServing = true

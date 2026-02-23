@@ -3,6 +3,7 @@ from pyathena import connect
 from pyathena.pandas.cursor import PandasCursor
 import pyodbc
 import logging
+import concurrent.futures
 
 class CountChecker:
     def __init__(self, args):
@@ -43,8 +44,10 @@ class CountChecker:
                     f"PWD={self.args.mssql_password};"
                 )
             
-            if '.' in table_str: full_obj_name = table_str
-            else: full_obj_name = f"dbo.{table_str}"
+            if '.' in table_str: 
+                full_obj_name = table_str
+            else: 
+                full_obj_name = f"dbo.{table_str}"
 
             with pyodbc.connect(conn_str, timeout=30) as conn:
                 query = "SELECT COALESCE(SUM(rows), 0) as cnt FROM sys.partitions WHERE object_id = OBJECT_ID(?) AND index_id IN (0, 1)"
@@ -55,37 +58,87 @@ class CountChecker:
             logging.error(f"Failed to fetch SQL Server count for {table_str}: {str(e)}")
             raise
 
+    def _process_single_table(self, athena_table: str, sql_table: str) -> tuple:
+        """Worker function to process a single table mapping. NO CALLBACKS HERE (Thread-Safe)."""
+        table_result = {
+            'id': athena_table.lower().replace(' ', '_'), 
+            'athena_name': athena_table, 
+            'sql_name': sql_table, 
+            'has_issues': False, 
+            'issues': [], 
+            'counts': {
+                'athena_count': 'Error', 
+                'sql_count': 'Error', 
+                'status': 'Error', 
+                'status_class': 'error'
+            }
+        }
+        
+        try:
+            athena_count = self.get_athena_count(athena_table)
+            sql_count = self.get_sqlserver_count(sql_table)
+            
+            status = 'Match' if athena_count == sql_count else 'Mismatch'
+            status_class = 'match' if athena_count == sql_count else 'error'
+            
+            table_result['counts'] = {
+                'athena_count': athena_count, 
+                'sql_count': sql_count, 
+                'status': status, 
+                'status_class': status_class
+            }
+            
+            if athena_count != sql_count:
+                diff = abs(athena_count - sql_count)
+                table_result['issues'].append(f"Row count mismatch: Athena ({athena_count}) vs SQL Server ({sql_count}). Diff: {diff}")
+                table_result['has_issues'] = True
+                return table_result, False
+            else:
+                return table_result, True
+                
+        except Exception as e:
+            table_result['issues'].append(str(e))
+            table_result['has_issues'] = True
+            return table_result, False
+
     def check_counts(self, mappings: dict, callback=None) -> dict:
         results = {'total_tables': len(mappings), 'valid_tables': 0, 'error_tables': 0, 'tables': []}
         
-        for athena_table, config in mappings.items():
-            if callback: callback(f"Counting rows: {athena_table}...")
+        max_workers = min(10, len(mappings)) if len(mappings) > 0 else 1
+        
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_table = {
+                executor.submit(self._process_single_table, ath_table, config['sql_table']): ath_table
+                for ath_table, config in mappings.items()
+            }
             
-            sql_table = config['sql_table']
-            table_result = {'id': athena_table.lower().replace(' ', '_'), 'athena_name': athena_table, 'sql_name': sql_table, 'has_issues': False, 'issues': [], 'counts': {}}
-            
-            try:
-                athena_count = self.get_athena_count(athena_table)
-                sql_count = self.get_sqlserver_count(sql_table)
+            # The UI callback is now safely executed in the main thread as futures complete
+            for future in concurrent.futures.as_completed(future_to_table):
+                athena_table = future_to_table[future]
                 
-                status = 'Match' if athena_count == sql_count else 'Mismatch'
-                status_class = 'match' if athena_count == sql_count else 'error'
-                
-                table_result['counts'] = {'athena_count': athena_count, 'sql_count': sql_count, 'status': status, 'status_class': status_class}
-                
-                if athena_count != sql_count:
-                    diff = abs(athena_count - sql_count)
-                    table_result['issues'].append(f"Row count mismatch: Athena ({athena_count}) vs SQL Server ({sql_count}). Diff: {diff}")
-                    table_result['has_issues'] = True
+                try:
+                    table_result, is_valid = future.result()
+                    results['tables'].append(table_result)
+                    
+                    if is_valid:
+                        results['valid_tables'] += 1
+                        if callback: callback(f"Count Match: {athena_table}")
+                    else:
+                        results['error_tables'] += 1
+                        if callback: callback(f"Count Failed/Mismatch: {athena_table}")
+                        
+                except Exception as exc:
+                    logging.error(f"{athena_table} generated an exception: {exc}")
                     results['error_tables'] += 1
-                else:
-                    results['valid_tables'] += 1
-            except Exception as e:
-                msg = f"Count Check Error on {athena_table}: {str(e)}"
-                if callback: callback(f"ERROR: {msg}")
-                table_result['issues'].append(str(e))
-                table_result['has_issues'] = True
-                results['error_tables'] += 1
-            
-            results['tables'].append(table_result)
+                    if callback: callback(f"ERROR on {athena_table}: {str(exc)}")
+                    
+                    results['tables'].append({
+                        'id': athena_table.lower().replace(' ', '_'),
+                        'athena_name': athena_table,
+                        'sql_name': mappings[athena_table]['sql_table'],
+                        'has_issues': True,
+                        'issues': [f"Critical execution error: {str(exc)}"],
+                        'counts': {'athena_count': 'Error', 'sql_count': 'Error', 'status': 'Error', 'status_class': 'error'}
+                    })
+        
         return results
